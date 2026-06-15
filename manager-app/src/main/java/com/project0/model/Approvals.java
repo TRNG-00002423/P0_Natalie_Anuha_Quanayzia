@@ -9,12 +9,12 @@ public class Approvals {
     String comment;
     String review_date;
 
-    public Approvals(int id, int expense_id, String status, int reviewer, String text, String review_date) {
+    public Approvals(int id, int expense_id, String status, int reviewer, String comment, String review_date) {
         this.id = id;
         this.expense_id = expense_id;
         this.status = status;
         this.reviewer = reviewer;
-        this.comment = text;
+        this.comment = comment;
         this.review_date = review_date;
     }
 
