@@ -50,11 +50,11 @@ public class Approvals {
         this.reviewer = reviewer;
     }
 
-    public String getText() {
+    public String getComment() {
         return comment;
     }
 
-    public void setText(String text) {
+    public void setComment(String Comment) {
         this.comment = comment;
     }
 
