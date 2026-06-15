@@ -6,7 +6,7 @@ public class Approvals {
     int expense_id;
     String status;
     int reviewer;
-    String text;
+    String comment;
     String review_date;
 
     public Approvals(int id, int expense_id, String status, int reviewer, String text, String review_date) {
@@ -14,7 +14,7 @@ public class Approvals {
         this.expense_id = expense_id;
         this.status = status;
         this.reviewer = reviewer;
-        this.text = text;
+        this.comment = text;
         this.review_date = review_date;
     }
 
@@ -51,11 +51,11 @@ public class Approvals {
     }
 
     public String getText() {
-        return text;
+        return comment;
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.comment = comment;
     }
 
     public String getReview_date() {
