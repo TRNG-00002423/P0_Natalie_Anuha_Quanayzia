@@ -6,15 +6,15 @@ public class Approvals {
     int expense_id;
     String status;
     int reviewer;
-    String text;
+    String comment;
     String review_date;
 
-    public Approvals(int id, int expense_id, String status, int reviewer, String text, String review_date) {
+    public Approvals(int id, int expense_id, String status, int reviewer, String comment, String review_date) {
         this.id = id;
         this.expense_id = expense_id;
         this.status = status;
         this.reviewer = reviewer;
-        this.text = text;
+        this.comment = comment;
         this.review_date = review_date;
     }
 
@@ -50,12 +50,12 @@ public class Approvals {
         this.reviewer = reviewer;
     }
 
-    public String getText() {
-        return text;
+    public String getComment() {
+        return comment;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setComment(String Comment) {
+        this.comment = comment;
     }
 
     public String getReview_date() {
