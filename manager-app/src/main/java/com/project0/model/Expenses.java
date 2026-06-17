@@ -11,6 +11,15 @@ public class Expenses {
     String description;
     String date;
 
+    public Expenses(int id, int user_id, BigDecimal amount, String description, String date) {
+        this.id = id;
+        this.user_id = user_id;
+        this.amount = amount;
+        this.description = description;
+        this.date = date;
+    }
+
+
     public int getId() {
         return id;
     }
