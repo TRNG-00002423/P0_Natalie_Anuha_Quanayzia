@@ -13,14 +13,15 @@ create table expenses (
     user_id INTEGER REFERENCES users(id),
     amount REAL,
     description TEXT,
-    date TEXT,
-    status TEXT DEFAULT 'pending'
+    date TEXT
 );
 
 create table approvals (
     id INTEGER PRIMARY KEY,
     expense_id INTEGER REFERENCES expenses(id) UNIQUE,
+    status TEXT DEFAULT 'pending',
     reviewer INTEGER,
     comment TEXT,
     review_date TEXT
 );
+
