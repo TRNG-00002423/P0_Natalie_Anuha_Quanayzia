@@ -7,11 +7,12 @@ from django.utils import timezone
 class User(models.Model):
     username = models.CharField(max_length=25)
     password = models.CharField(max_length=15)
-    role_choices=(
-        (1, 'Manager'),
-        (2, 'Employee'),
-    )
-    role = models.IntegerField(choices=role_choices, default=2)
+    # role_choices=(
+    #     (1, 'Manager'),
+    #     (2, 'Employee'),
+    # )
+    # role = models.IntegerField(choices=role_choices, default=2)
+    role = models.CharField(max_length=9)
 
     def __str__(self):
         return self.username
@@ -35,17 +36,17 @@ class Expense(models.Model):
 
 class Approval(models.Model):
     expense_id = models.ForeignKey(Expense, on_delete=models.CASCADE)
-    # status = models.CharField(max_length=20)
-    status_choices=(
-        (1, 'Pending'),
-        (2, 'Approved'),
-        (3, 'Denied'),
-    )
-    status = models.IntegerField(choices=status_choices, default=1)
+    status = models.CharField(max_length=20)
+    # status_choices=(
+    #     (1, 'Pending'),
+    #     (2, 'Approved'),
+    #     (3, 'Denied'),
+    # )
+    # status = models.IntegerField(choices=status_choices, default=1)
     # Null if not reviewed yet
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
-    comment = models.CharField(max_length=255)
-    approved_date = models.DateTimeField('Date Review Decision Made')
+    comment = models.CharField(max_length=25)
+    approved_date = models.DateTimeField('Date Of Review')
 
     def __str__(self):
         return self.pk
