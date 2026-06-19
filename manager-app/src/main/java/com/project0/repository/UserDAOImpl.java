@@ -1,6 +1,7 @@
 package com.project0.repository;
 
 import com.project0.model.Users;
+import com.project0.util.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +13,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Users getUserByUsername(String username) {
-        String sqlSelect="SELECT * FROM users WHERE username=?";
+        String sqlSelect="SELECT * FROM ExpenseManager_user WHERE username=?";
        try(Connection conn = DatabaseConnection.getConnection();
            PreparedStatement stmt = conn.prepareStatement(sqlSelect)){
 
