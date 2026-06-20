@@ -14,9 +14,10 @@ public class UserDAOImplTest {
 
     @Test
     void getUserByUsername_returnUserWhenExists(){
-        Users user=userDAO.getUserByUsername("manager1");
+        Users user=userDAO.getUserByUsername("Elon Page");
         assertNotNull(user);;
-        assertEquals("manager1",user.getUsername());
+        assertEquals("Elon Page",user.getUsername());
+        assertEquals("EMPLOYEE", user.getRole());
 
     }
 }
