@@ -11,6 +11,8 @@ public interface ExpensesDAO {
     // will need to use a join table
     List<Expenses> getExpensesByEmployee(int employee_id);
     List<Expenses> getExpensesByDate(String date);
+    List<Expenses> getPendingExpenses();
+
 
 
 
