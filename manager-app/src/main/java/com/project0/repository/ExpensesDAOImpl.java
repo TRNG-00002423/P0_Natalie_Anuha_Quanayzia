@@ -95,6 +95,28 @@ public class ExpensesDAOImpl implements ExpensesDAO {
         return expenses;
     }
 
+    @Override
+    public List<Expenses> getPendingExpenses() {
+        String sql = "SELECT e.* FROM ExpenseManager_expense e " +
+                "JOIN ExpenseManager_approval a ON e.id = a.expense_id_id " +
+                "WHERE a.status = 'pending'";
+        List<Expenses> expenses = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                expenses.add(mapRowToExpense(rs));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return expenses;
+    }
+
     private Expenses mapRowToExpense(ResultSet rs) throws SQLException {
         return new Expenses(
                 rs.getInt("id"),
