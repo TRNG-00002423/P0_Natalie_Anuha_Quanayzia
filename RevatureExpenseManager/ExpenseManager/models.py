@@ -5,7 +5,7 @@ from django.utils import timezone
 
 
 class User(models.Model):
-    username = models.CharField(max_length=25)
+    username = models.CharField(max_length=25, unique=True)
     password = models.CharField(max_length=15)
     # role_choices=(
     #     (1, 'Manager'),
@@ -44,9 +44,9 @@ class Approval(models.Model):
     # )
     # status = models.IntegerField(choices=status_choices, default=1)
     # Null if not reviewed yet
-    reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
-    comment = models.CharField(max_length=25)
-    approved_date = models.DateTimeField('Date Of Review')
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE, null=True,blank=True)
+    comment = models.TextField(blank=True)
+    approved_date = models.DateTimeField('Date Of Review',null=True,blank=True)
 
     def __str__(self):
-        return self.pk
+        return f"Approval {self.id} - {self.status}"
