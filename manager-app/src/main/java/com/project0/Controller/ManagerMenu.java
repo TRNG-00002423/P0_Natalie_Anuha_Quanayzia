@@ -6,6 +6,8 @@ import com.project0.model.Expenses;
 import com.project0.model.Users;
 import com.project0.services.AuthService;
 import com.project0.services.ExpenseService;
+import com.project0.model.Approvals;
+import com.project0.services.ApprovalService;
 
 import java.util.List;
 import java.util.Scanner;
@@ -15,6 +17,7 @@ public class ManagerMenu {
 
     private AuthService as=new AuthService();
     private ExpenseService es= new ExpenseService();
+    private ApprovalService approvalService= new ApprovalService();
     private Users currentUser;
     private Scanner scanner = new Scanner(System.in);
 
@@ -80,6 +83,40 @@ public class ManagerMenu {
     }
 
     private void reviewExpense() {
+        viewPendingExpenses();
+
+        System.out.print("Enter the expense ID to review: ");
+        int expenseId;
+        try {
+            expenseId = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid ID — please enter a number.");
+            return;
+        }
+
+        System.out.print("Approve or Deny? (a/d): ");
+        String choice = scanner.nextLine().trim().toLowerCase();
+
+        String status;
+        if (choice.equals("a")) {
+            status = "approved";
+        } else if (choice.equals("d")) {
+            status = "denied";
+        } else {
+            System.out.println("Invalid choice.");
+            return;
+        }
+
+        System.out.print("Comment: ");
+        String comment = scanner.nextLine();
+
+        Approvals result = approvalService.reviewExpense(expenseId, currentUser.getId(), status, comment);
+
+        if (result != null) {
+            System.out.println("Expense #" + expenseId + " has been " + result.getStatus() + ".");
+        } else {
+            System.out.println("Could not update — no approval found for that expense.");
+        }
     }
 
 
