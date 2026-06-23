@@ -44,6 +44,7 @@ class Approval(models.Model):
     # )
     # status = models.IntegerField(choices=status_choices, default=1)
     # Null if not reviewed yet
+
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE, null=True,blank=True)
     comment = models.TextField(blank=True)
     approved_date = models.DateTimeField('Date Of Review',null=True,blank=True)

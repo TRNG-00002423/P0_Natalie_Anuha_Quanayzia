@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Submit a New Expense</h1>
+
+    {% if error %}<p style="color:red">{{ error }}</p>{% endif %}
+    {% if message %}<p style="color:green">{{ message }}</p>{% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label>Amount: <input type="text" name="amount"></label>
+        <br><br>
+
+        <label>Description: <input type="text" name="description"></label>
+        <br><br>
+
+        <button type="submit">Submit Expense</button>
+    </form>
+</body>
+</html>
