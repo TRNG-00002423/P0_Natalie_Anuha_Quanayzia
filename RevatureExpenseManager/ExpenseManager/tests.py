@@ -30,10 +30,19 @@ class ModelTests(TestCase):
         )
 
 
+        # creation
         self.assertEqual(user.username, "testuser")
         self.assertEqual(expense.user_id, user)
         self.assertEqual(approval.expense_id, expense)
 
+        # retrieval tests
+        retrieved_user = User.objects.get(username="testuser")
+        retrieved_expense = Expense.objects.get(id=expense.id)
+        retrieved_approval = Approval.objects.get(id=approval.id)
+
+        self.assertEqual(retrieved_user.username, "testuser")
+        self.assertEqual(retrieved_expense.description, "Lunch")
+        self.assertEqual(retrieved_approval.status, "pending")
 
 
    
