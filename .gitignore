@@ -37,5 +37,16 @@ build/
 ### VS Code ###
 .vscode/
 
+# Virtual environments
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# SQLite database
+db.sqlite3
+
 ### Mac OS ###
 .DS_Store
