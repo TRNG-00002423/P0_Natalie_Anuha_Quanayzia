@@ -1,194 +1,112 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.template import loader
-from django.utils import timezone
-from .models import User, Expense, Approval
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .service import ExpenseService, AuthenticationService
+from .exceptions import AuthenticationError
 
 
-def index(request):
-    template = loader.get_template('expensemanager.html')
-    return HttpResponse(template.render())
+@api_view(['POST'])
+def login(request):
+    try:
+        user = AuthenticationService.login(
+            request.data.get('username'),
+            request.data.get('password')
+        )
+    except AuthenticationError as e:
+        return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response({'user_id': user.id})
 
 
+@api_view(['POST'])
 def submit_expense(request):
-    
-    user_id = request.session.get('user_id')
+    user_id = request.data.get('user_id')
     if not user_id:
-        return redirect('login')
-    employee = User.objects.get(id=user_id)
+        return Response({'error': 'Unauthorized.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    if request.method == 'POST':
-        amount = request.POST.get('amount')
-        description = request.POST.get('description')
+    amount = request.data.get('amount')
+    description = request.data.get('description')
 
-        # make sure its valid
-        try:
-            amount = float(amount)
-        except (ValueError, TypeError):
-            return render(request, 'submit.html', {'error': 'Invalid amount. Please enter a number.'})
-        if amount <= 0:
-            return render(request, 'submit.html', {'error': 'Amount must be greater than zero.'})
+    try:
+        amount = float(amount)
+    except (ValueError, TypeError):
+        return Response({'error': 'Invalid amount.'}, status=status.HTTP_400_BAD_REQUEST)
+    if amount <= 0:
+        return Response({'error': 'Amount must be greater than zero.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        
-
-        expense = Expense.objects.create(
-            user_id=employee,
-            amount=amount,
-            description=description,
-            created_date=timezone.now(),)
-        
-
-        Approval.objects.create(expense_id=expense, status='pending')
-
-        return render(request, 'submit.html', {'message': 'Expense submitted and pending review.'})
-
-    # empty form
-    return render(request, 'submit.html')
+    employee = ExpenseService.get_user_by_id(user_id)
+    ExpenseService.submit_expense(employee, amount, description)
+    return Response({'message': 'Expense submitted and pending review.'}, status=status.HTTP_201_CREATED)
 
 
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-        if not username or not password:
-            return render(request, 'login.html', {'error': 'Please enter both username and password.'})
-
-        user = User.objects.filter(username=username, password=password).first()
-
-        if user:
-            request.session['user_id'] = user.id
-            return redirect('menu')
-        else:
-            return render(request, 'login.html', {'error': 'Invalid username or password.'})
-
-    #login form
-    return render(request, 'login.html')
-
-
-def logout_view(request):
-    request.session.flush()
-    return redirect('login')
-
-
-def menu(request):
-    
-    if not request.session.get('user_id'):
-        return redirect('login')
-    return render(request, 'menu.html')
-
-
+@api_view(['GET'])
 def view_expenses(request):
-    user_id = request.session.get('user_id')
+    user_id = request.data.get('user_id')
     if not user_id:
-        return redirect('login')
-    employee = User.objects.get(id=user_id)
+        return Response({'error': 'Unauthorized.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    expenses = Expense.objects.filter(user_id=employee)
-    rows = []
-    for e in expenses:
-        approval = Approval.objects.filter(expense_id=e).first()
-        status = approval.status if approval else 'pending'
-        rows.append({'expense': e, 'status': status})
+    employee = ExpenseService.get_user_by_id(user_id)
+    rows = ExpenseService.get_expenses_with_status(employee)
+    data = [{'expense_id': r['expense'].id, 'amount': r['expense'].amount, 'description': r['expense'].description, 'status': r['status']} for r in rows]
+    return Response(data)
 
-    return render(request, 'view_expenses.html', {'rows': rows})
 
+@api_view(['GET'])
 def view_history(request):
-    user_id = request.session.get('user_id')
+    user_id = request.data.get('user_id')
     if not user_id:
-        return redirect('login')
-    employee = User.objects.get(id=user_id)
-    expenses = Expense.objects.filter(user_id=employee)
-    rows = []
-    total_approved = 0
-    total_denied = 0
-    for e in expenses:
-        approval = Approval.objects.filter(expense_id=e).first()
-        if approval and approval.status == 'approved':
-            rows.append({'expense': e, 'status': 'approved'})
-            total_approved += e.amount
-        elif approval and approval.status == 'denied':
-            rows.append({'expense': e, 'status': 'denied'})
-            total_denied += e.amount
+        return Response({'error': 'Unauthorized.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    return render(request, 'view_history.html', {
-        'rows': rows,
-        'total_approved': total_approved,
-        'total_denied': total_denied,
-    })
+    employee = ExpenseService.get_user_by_id(user_id)
+    rows, total_approved, total_denied = ExpenseService.get_expense_history(employee)
+    data = [{'expense_id': r['expense'].id, 'amount': r['expense'].amount, 'description': r['expense'].description, 'status': r['status']} for r in rows]
+    return Response({'expenses': data, 'total_approved': total_approved, 'total_denied': total_denied})
 
 
-def edit_pending(request):
-    user_id = request.session.get('user_id')
+@api_view(['GET'])
+def get_pending_expenses(request):
+    user_id = request.data.get('user_id')
     if not user_id:
-        return redirect('login')
-    employee = User.objects.get(id=user_id)
+        return Response({'error': 'Unauthorized.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    all_expenses = Expense.objects.filter(user_id=employee)
-    expenses = []
-    for e in all_expenses:
-        approval = Approval.objects.filter(expense_id=e).first()
-        if approval and approval.status == 'pending':
-            expenses.append(e)
-
-    return render(request, 'edit_pending.html', {'expenses': expenses})
+    employee = ExpenseService.get_user_by_id(user_id)
+    expenses = ExpenseService.get_pending_expenses(employee)
+    data = [{'expense_id': e.id, 'amount': e.amount, 'description': e.description} for e in expenses]
+    return Response(data)
 
 
-def delete_expense(request, expense_id):
-    user_id = request.session.get('user_id')
-    if not user_id:
-        return redirect('login')
-    employee = User.objects.get(id=user_id)
-
-    if request.method == 'POST':
-        expense = Expense.objects.filter(id=expense_id, user_id=employee).first()
-        if expense:
-            approval = Approval.objects.filter(expense_id=expense).first()
-     
-            if approval and approval.status == 'pending':
-                expense.delete() 
-
-    return redirect('edit_pending')
-
-
+@api_view(['PUT'])
 def edit_expense(request, expense_id):
-    user_id = request.session.get('user_id')
+    user_id = request.data.get('user_id')
     if not user_id:
-        return redirect('login')
-    employee = User.objects.get(id=user_id)
+        return Response({'error': 'Unauthorized.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-    expense = Expense.objects.filter(id=expense_id, user_id=employee).first()
+    employee = ExpenseService.get_user_by_id(user_id)
+    expense, _ = ExpenseService.get_pending_expense(employee, expense_id)
     if not expense:
-        return redirect('edit_pending')
+        return Response({'error': 'Expense not found or not editable.'}, status=status.HTTP_404_NOT_FOUND)
 
-    
-    approval = Approval.objects.filter(expense_id=expense).first()
-    if not approval or approval.status != 'pending':
-        return redirect('edit_pending')
+    amount = request.data.get('amount')
+    description = request.data.get('description')
 
-    if request.method == 'POST':
-        amount = request.POST.get('amount')
-        description = request.POST.get('description')
+    try:
+        amount = float(amount)
+    except (ValueError, TypeError):
+        return Response({'error': 'Invalid amount.'}, status=status.HTTP_400_BAD_REQUEST)
+    if amount <= 0:
+        return Response({'error': 'Amount must be greater than zero.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            amount = float(amount)
-        except (ValueError, TypeError):
-            return render(request, 'edit_expense.html', {'expense': expense, 'error': 'Invalid amount. Please enter a number.'})
-        if amount <= 0:
-            return render(request, 'edit_expense.html', {'expense': expense, 'error': 'Amount must be greater than zero.'})
+    ExpenseService.update_expense(expense, amount, description)
+    return Response({'message': 'Expense updated.'})
 
 
-        expense.amount = amount
-        expense.description = description
-        expense.save()
-        return redirect('edit_pending')
+@api_view(['DELETE'])
+def delete_expense(request, expense_id):
+    user_id = request.data.get('user_id')
+    if not user_id:
+        return Response({'error': 'Unauthorized.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    
-    return render(request, 'edit_expense.html', {'expense': expense})
-
-
-
-        
-    
-
+    employee = ExpenseService.get_user_by_id(user_id)
+    deleted = ExpenseService.delete_pending_expense(employee, expense_id)
+    if deleted:
+        return Response({'message': 'Expense deleted.'})
+    return Response({'error': 'Expense not found or not deletable.'}, status=status.HTTP_404_NOT_FOUND)
