@@ -118,6 +118,76 @@ def view_history(request):
     })
 
 
+def edit_pending(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    employee = User.objects.get(id=user_id)
+
+    all_expenses = Expense.objects.filter(user_id=employee)
+    expenses = []
+    for e in all_expenses:
+        approval = Approval.objects.filter(expense_id=e).first()
+        if approval and approval.status == 'pending':
+            expenses.append(e)
+
+    return render(request, 'edit_pending.html', {'expenses': expenses})
+
+
+def delete_expense(request, expense_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    employee = User.objects.get(id=user_id)
+
+    if request.method == 'POST':
+        expense = Expense.objects.filter(id=expense_id, user_id=employee).first()
+        if expense:
+            approval = Approval.objects.filter(expense_id=expense).first()
+     
+            if approval and approval.status == 'pending':
+                expense.delete() 
+
+    return redirect('edit_pending')
+
+
+def edit_expense(request, expense_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    employee = User.objects.get(id=user_id)
+
+
+    expense = Expense.objects.filter(id=expense_id, user_id=employee).first()
+    if not expense:
+        return redirect('edit_pending')
+
+    
+    approval = Approval.objects.filter(expense_id=expense).first()
+    if not approval or approval.status != 'pending':
+        return redirect('edit_pending')
+
+    if request.method == 'POST':
+        amount = request.POST.get('amount')
+        description = request.POST.get('description')
+
+        try:
+            amount = float(amount)
+        except (ValueError, TypeError):
+            return render(request, 'edit_expense.html', {'expense': expense, 'error': 'Invalid amount. Please enter a number.'})
+        if amount <= 0:
+            return render(request, 'edit_expense.html', {'expense': expense, 'error': 'Amount must be greater than zero.'})
+
+
+        expense.amount = amount
+        expense.description = description
+        expense.save()
+        return redirect('edit_pending')
+
+    
+    return render(request, 'edit_expense.html', {'expense': expense})
+
+
 
         
     
