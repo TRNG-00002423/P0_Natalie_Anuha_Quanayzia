@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Edit / Delete Pending Expenses</h1>
+
+    {% if not expenses %}
+        <p>You have no pending expenses.</p>
+    {% else %}
+        <ul>
+            {% for expense in expenses %}
+                <li>
+                    ${{ expense.amount }} &mdash;
+                    {{ expense.description }} &mdash;
+                    {{ expense.created_date }}
+                    &nbsp;&nbsp; <a href="{% url 'edit_expense' expense.id %}">Edit</a> |
+                    <form method="post" action="{% url 'delete_expense' expense.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <a href="{% url 'menu' %}">&larr; Back to Menu</a>
+</body>
+</html>
