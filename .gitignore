@@ -5,6 +5,7 @@ target/
 .kotlin
 
 ### IntelliJ IDEA ###
+.idea/
 ../.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
@@ -35,6 +36,17 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Virtual environments
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# SQLite database
+db.sqlite3
 
 ### Mac OS ###
 .DS_Store
