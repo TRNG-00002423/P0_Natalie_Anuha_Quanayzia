@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>My Expenses</h1>
+
+    {% if not rows %}
+        <p>You have not submitted any expenses yet.</p>
+    {% else %}
+        <ul>
+            {% for row in rows %}
+                <li>
+                    ${{ row.expense.amount }} —
+                    {{ row.expense.description }} —
+                    {{ row.expense.created_date }} —
+                    <strong>[{{ row.status }}]</strong>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <a href="{% url 'menu' %}">&larr; Back to Menu</a>
+</body>
+</html>

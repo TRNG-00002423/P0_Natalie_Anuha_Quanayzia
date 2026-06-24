@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Expense History</h1>
+
+    {% if not rows %}
+        <p>You have no approved or denied expenses yet.</p>
+    {% else %}
+        <ul>
+            {% for row in rows %}
+                <li>
+                    ${{ row.expense.amount }} —
+                    {{ row.expense.description }} —
+                    {{ row.expense.created_date }} —
+                    <strong>[{{ row.status }}]</strong>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p><strong>Total approved:</strong> ${{ total_approved }} &nbsp;|&nbsp; <strong>Total denied:</strong> ${{ total_denied }}</p>
+
+    <a href="{% url 'menu' %}">&larr; Back to Menu</a>
+</body>
+</html>

@@ -58,7 +58,7 @@ def login_view(request):
 
         if user:
             request.session['user_id'] = user.id
-            return redirect('submit_expense')
+            return redirect('menu')
         else:
             return render(request, 'login.html', {'error': 'Invalid username or password.'})
 
@@ -69,6 +69,56 @@ def login_view(request):
 def logout_view(request):
     request.session.flush()
     return redirect('login')
+
+
+def menu(request):
+    
+    if not request.session.get('user_id'):
+        return redirect('login')
+    return render(request, 'menu.html')
+
+
+def view_expenses(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    employee = User.objects.get(id=user_id)
+
+    expenses = Expense.objects.filter(user_id=employee)
+    rows = []
+    for e in expenses:
+        approval = Approval.objects.filter(expense_id=e).first()
+        status = approval.status if approval else 'pending'
+        rows.append({'expense': e, 'status': status})
+
+    return render(request, 'view_expenses.html', {'rows': rows})
+
+def view_history(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    employee = User.objects.get(id=user_id)
+    expenses = Expense.objects.filter(user_id=employee)
+    rows = []
+    total_approved = 0
+    total_denied = 0
+    for e in expenses:
+        approval = Approval.objects.filter(expense_id=e).first()
+        if approval and approval.status == 'approved':
+            rows.append({'expense': e, 'status': 'approved'})
+            total_approved += e.amount
+        elif approval and approval.status == 'denied':
+            rows.append({'expense': e, 'status': 'denied'})
+            total_denied += e.amount
+
+    return render(request, 'view_history.html', {
+        'rows': rows,
+        'total_approved': total_approved,
+        'total_denied': total_denied,
+    })
+
+
+
         
     
 
