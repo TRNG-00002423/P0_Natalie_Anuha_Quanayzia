@@ -25,6 +25,7 @@ def submit_expense(request):
 
     amount = request.data.get('amount')
     description = request.data.get('description')
+    category = request.data.get('category', 'OTHER')
 
     try:
         amount = float(amount)
@@ -34,31 +35,28 @@ def submit_expense(request):
         return Response({'error': 'Amount must be greater than zero.'}, status=status.HTTP_400_BAD_REQUEST)
 
     employee = ExpenseService.get_user_by_id(user_id)
-    ExpenseService.submit_expense(employee, amount, description)
+    ExpenseService.submit_expense(employee, amount, description, category)
     return Response({'message': 'Expense submitted and pending review.'}, status=status.HTTP_201_CREATED)
-
 
 @api_view(['GET'])
 def view_expenses(request, user_id):
     employee = ExpenseService.get_user_by_id(user_id)
     rows = ExpenseService.get_expenses_with_status(employee)
-    data = [{'expense_id': r['expense'].id, 'amount': r['expense'].amount, 'description': r['expense'].description, 'status': r['status']} for r in rows]
+    data = [{'expense_id': r['expense'].id, 'amount': r['expense'].amount, 'category': r['expense'].category, 'description': r['expense'].description, 'status': r['status']} for r in rows]
     return Response(data)
-
 
 @api_view(['GET'])
 def view_history(request, user_id):
     employee = ExpenseService.get_user_by_id(user_id)
     rows, total_approved, total_denied = ExpenseService.get_expense_history(employee)
-    data = [{'expense_id': r['expense'].id, 'amount': r['expense'].amount, 'description': r['expense'].description, 'status': r['status']} for r in rows]
+    data = [{'expense_id': r['expense'].id, 'amount': r['expense'].amount, 'category': r['expense'].category, 'description': r['expense'].description, 'status': r['status']} for r in rows]
     return Response({'expenses': data, 'total_approved': total_approved, 'total_denied': total_denied})
-
 
 @api_view(['GET'])
 def get_pending_expenses(request, user_id):
     employee = ExpenseService.get_user_by_id(user_id)
     expenses = ExpenseService.get_pending_expenses(employee)
-    data = [{'expense_id': e.id, 'amount': e.amount, 'description': e.description} for e in expenses]
+    data = [{'expense_id': e.id, 'amount': e.amount, 'category':e.category, 'description': e.description} for e in expenses]
     return Response(data)
 
 

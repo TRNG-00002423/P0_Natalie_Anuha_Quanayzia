@@ -6,16 +6,16 @@ def get_user_by_id(user_id):
     return User.objects.get(id=user_id)
 
 
-def submit_expense(employee, amount, description):
+def submit_expense(employee, amount, description, category):
     expense = Expense.objects.create(
         user_id=employee,
         amount=amount,
         description=description,
+        category=category,
         created_date=timezone.now(),
     )
     Approval.objects.create(expense_id=expense, status='pending')
     return expense
-
 
 def get_expenses_with_status(employee):
     expenses = Expense.objects.filter(user_id=employee)
