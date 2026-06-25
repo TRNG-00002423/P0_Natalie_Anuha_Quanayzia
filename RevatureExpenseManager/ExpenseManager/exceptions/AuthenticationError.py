@@ -1,2 +1,3 @@
+
 class AuthenticationError(Exception):
     pass

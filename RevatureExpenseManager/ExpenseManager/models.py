@@ -20,8 +20,24 @@ class User(models.Model):
 
 
 class Expense(models.Model):
+
+    class Category(models.TextChoices):
+        MEALS = "MEALS"
+        TRAVEL = "TRAVEL"
+        LODGING = "LODGING"
+        OFFICE = "OFFICE"
+        OTHER = "OTHER"
+
+
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.FloatField(default=0)
+    
+    category = models.CharField(
+        max_length=20,
+        choices=Category.choices,
+        default=Category.OTHER
+    )
+    
     description = models.CharField(max_length=255)
     created_date = models.DateTimeField('Date Of Expense')
 
