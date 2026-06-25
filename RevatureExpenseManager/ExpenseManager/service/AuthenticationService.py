@@ -1,5 +1,4 @@
-from ExpenseManager.exceptions import AuthenticationError
-
+from ..exceptions import AuthenticationError
 from ..models import User
 
 

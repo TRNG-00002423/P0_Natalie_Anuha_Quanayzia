@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .service import ExpenseService, AuthenticationService
-from .exceptions import AuthenticationError
+from .exceptions.AuthenticationError import AuthenticationError
 
 
 @api_view(['POST'])
@@ -39,11 +39,7 @@ def submit_expense(request):
 
 
 @api_view(['GET'])
-def view_expenses(request):
-    user_id = request.data.get('user_id')
-    if not user_id:
-        return Response({'error': 'Unauthorized.'}, status=status.HTTP_401_UNAUTHORIZED)
-
+def view_expenses(request, user_id):
     employee = ExpenseService.get_user_by_id(user_id)
     rows = ExpenseService.get_expenses_with_status(employee)
     data = [{'expense_id': r['expense'].id, 'amount': r['expense'].amount, 'description': r['expense'].description, 'status': r['status']} for r in rows]
@@ -51,11 +47,7 @@ def view_expenses(request):
 
 
 @api_view(['GET'])
-def view_history(request):
-    user_id = request.data.get('user_id')
-    if not user_id:
-        return Response({'error': 'Unauthorized.'}, status=status.HTTP_401_UNAUTHORIZED)
-
+def view_history(request, user_id):
     employee = ExpenseService.get_user_by_id(user_id)
     rows, total_approved, total_denied = ExpenseService.get_expense_history(employee)
     data = [{'expense_id': r['expense'].id, 'amount': r['expense'].amount, 'description': r['expense'].description, 'status': r['status']} for r in rows]
@@ -63,11 +55,7 @@ def view_history(request):
 
 
 @api_view(['GET'])
-def get_pending_expenses(request):
-    user_id = request.data.get('user_id')
-    if not user_id:
-        return Response({'error': 'Unauthorized.'}, status=status.HTTP_401_UNAUTHORIZED)
-
+def get_pending_expenses(request, user_id):
     employee = ExpenseService.get_user_by_id(user_id)
     expenses = ExpenseService.get_pending_expenses(employee)
     data = [{'expense_id': e.id, 'amount': e.amount, 'description': e.description} for e in expenses]
@@ -75,11 +63,7 @@ def get_pending_expenses(request):
 
 
 @api_view(['PUT'])
-def edit_expense(request, expense_id):
-    user_id = request.data.get('user_id')
-    if not user_id:
-        return Response({'error': 'Unauthorized.'}, status=status.HTTP_401_UNAUTHORIZED)
-
+def edit_expense(request, user_id, expense_id):
     employee = ExpenseService.get_user_by_id(user_id)
     expense, _ = ExpenseService.get_pending_expense(employee, expense_id)
     if not expense:
@@ -100,11 +84,7 @@ def edit_expense(request, expense_id):
 
 
 @api_view(['DELETE'])
-def delete_expense(request, expense_id):
-    user_id = request.data.get('user_id')
-    if not user_id:
-        return Response({'error': 'Unauthorized.'}, status=status.HTTP_401_UNAUTHORIZED)
-
+def delete_expense(request, user_id, expense_id):
     employee = ExpenseService.get_user_by_id(user_id)
     deleted = ExpenseService.delete_pending_expense(employee, expense_id)
     if deleted:
