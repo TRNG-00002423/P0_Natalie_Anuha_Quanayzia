@@ -47,6 +47,7 @@ __pycache__/
 
 # SQLite database
 db.sqlite3
+seed.py
 
 ### Mac OS ###
 .DS_Store
