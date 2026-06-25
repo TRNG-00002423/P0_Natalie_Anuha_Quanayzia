@@ -11,6 +11,7 @@ import com.project0.services.ApprovalService;
 
 import java.util.List;
 import java.util.Scanner;
+import java.math.BigDecimal;
 
 public class ManagerMenu {
 
@@ -80,6 +81,54 @@ public class ManagerMenu {
     }
 
     private void reportsMenu() {
+        System.out.println("\n=== Reports ===");
+        System.out.println("1. By Employee");
+        System.out.println("2. By Date");
+        System.out.println("3. By Category");
+        System.out.println("4. Back");
+        System.out.print("Choice: ");
+        String choice = scanner.nextLine();
+
+        List<Expenses> results;
+
+        if (choice.equals("1")) {
+            System.out.print("Enter employee ID: ");
+            int employeeId;
+            try {
+                employeeId = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid ID — please enter a number.");
+                return;
+            }
+            results = es.getExpensesByEmployee(employeeId);
+        } else if (choice.equals("2")) {
+            System.out.print("Enter date (YYYY-MM-DD): ");
+            String date = scanner.nextLine();
+            results = es.getExpensesByDate(date);
+        } else if (choice.equals("3")) {
+            System.out.print("Enter category (MEALS/TRAVEL/OFFICE/OTHER): ");
+            String category = scanner.nextLine();
+            results = es.getExpensesByCategory(category);
+        } else if (choice.equals("4")) {
+            return;
+        } else {
+            System.out.println("Invalid option.");
+            return;
+        }
+
+        if (results.isEmpty()) {
+            System.out.println("No expenses found for that report.");
+            return;
+        }
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (Expenses e : results) {
+            System.out.printf("ID: %d | Employee: %d | Amount: %s | %s | %s%n",
+                    e.getId(), e.getUser_id(), e.getAmount(), e.getDescription(), e.getDate());
+            total = total.add(e.getAmount());
+        }
+        System.out.println("-----------------------------");
+        System.out.printf("Total: %s%n", total);
     }
 
     private void reviewExpense() {

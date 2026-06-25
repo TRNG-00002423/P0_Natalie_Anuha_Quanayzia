@@ -10,13 +10,15 @@ public class Expenses {
     BigDecimal amount;
     String description;
     String date;
+    String category;
 
-    public Expenses(int id, int user_id, BigDecimal amount, String description, String date) {
+    public Expenses(int id, int user_id, BigDecimal amount, String description, String date, String category) {
         this.id = id;
         this.user_id = user_id;
         this.amount = amount;
         this.description = description;
         this.date = date;
+        this.category = category;
     }
 
 
@@ -58,5 +60,13 @@ public class Expenses {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }
