@@ -117,12 +117,34 @@ public class ExpensesDAOImpl implements ExpensesDAO {
         return expenses;
     }
 
+    @Override
+    public List<Expenses> getExpensesByCategory(String category) {
+        String sqlSelect = "SELECT * FROM ExpenseManager_expense WHERE category = ?";
+        List<Expenses> expenses = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlSelect)) {
+
+            stmt.setString(1, category);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                expenses.add(mapRowToExpense(rs));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return expenses;
+    }
+
     private Expenses mapRowToExpense(ResultSet rs) throws SQLException {
         return new Expenses(
                 rs.getInt("id"),
                 rs.getInt("user_id_id"),
                 rs.getBigDecimal("amount"),
                 rs.getString("description"),
-                rs.getString("created_date"));
+                rs.getString("created_date"),
+                rs.getString("category"));
     }
 }

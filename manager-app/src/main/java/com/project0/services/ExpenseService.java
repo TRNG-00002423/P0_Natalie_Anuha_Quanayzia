@@ -34,6 +34,8 @@ public class ExpenseService {
         return ed.getExpensesByDate(date);
     }
 
+    public List<Expenses> getExpensesByCategory(String category) {return ed.getExpensesByCategory(category);}
+
     public Expenses getExpenseById(int expense_id) {
         return ed.getExpenseByID(expense_id);
     }

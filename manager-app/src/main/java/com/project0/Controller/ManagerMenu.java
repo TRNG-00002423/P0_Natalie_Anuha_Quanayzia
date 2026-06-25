@@ -84,7 +84,8 @@ public class ManagerMenu {
         System.out.println("\n=== Reports ===");
         System.out.println("1. By Employee");
         System.out.println("2. By Date");
-        System.out.println("3. Back");
+        System.out.println("3. By Category");
+        System.out.println("4. Back");
         System.out.print("Choice: ");
         String choice = scanner.nextLine();
 
@@ -105,6 +106,10 @@ public class ManagerMenu {
             String date = scanner.nextLine();
             results = es.getExpensesByDate(date);
         } else if (choice.equals("3")) {
+            System.out.print("Enter category (MEALS/TRAVEL/OFFICE/OTHER): ");
+            String category = scanner.nextLine();
+            results = es.getExpensesByCategory(category);
+        } else if (choice.equals("4")) {
             return;
         } else {
             System.out.println("Invalid option.");
