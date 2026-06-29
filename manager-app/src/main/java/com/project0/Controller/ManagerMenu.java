@@ -57,6 +57,12 @@ public class ManagerMenu {
             System.out.println(e.getMessage());
             return false;
         }
+
+        if (!"manager".equalsIgnoreCase(currentUser.getRole())) {
+            System.out.println("This account is not a manager account.");
+            currentUser = null;
+            return false;
+        }
         return true;
     }
 
