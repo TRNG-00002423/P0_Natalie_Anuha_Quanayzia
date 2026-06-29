@@ -32,13 +32,14 @@ public class ExpenseServiceTest {
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO ExpenseManager_expense (user_id_id, amount, description, created_date) VALUES (?, ?, ?, ?)",
+                     "INSERT INTO ExpenseManager_expense (user_id_id, amount, description, created_date, category) VALUES (?, ?, ?, ?,?)",
                      Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, testUserId);
             stmt.setBigDecimal(2, new BigDecimal("42.50"));
             stmt.setString(3, TEST_DESCRIPTION);
             stmt.setString(4, TEST_DATE);
+            stmt.setString(5, TEST_DATE);
             stmt.executeUpdate();
 
             try (ResultSet keys = stmt.getGeneratedKeys()) {
