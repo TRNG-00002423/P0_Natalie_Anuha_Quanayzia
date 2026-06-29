@@ -17,13 +17,15 @@ def submit_expense(employee, amount, description, category):
     Approval.objects.create(expense_id=expense, status='pending')
     return expense
 
+
 def get_expenses_with_status(employee):
     expenses = Expense.objects.filter(user_id=employee)
     rows = []
     for e in expenses:
         approval = Approval.objects.filter(expense_id=e).first()
         status = approval.status if approval else 'pending'
-        rows.append({'expense': e, 'status': status})
+        rows.append({'expense': e, 'status': status,
+                     'submitted': e.created_date, 'reviewed_date': approval.approved_date if approval else None})
     return rows
 
 
@@ -35,20 +37,24 @@ def get_expense_history(employee):
     for e in expenses:
         approval = Approval.objects.filter(expense_id=e).first()
         if approval and approval.status == 'approved':
-            rows.append({'expense': e, 'status': 'approved'})
+            rows.append({'expense': e, 'status': 'approved', 'submitted': e.created_date,
+                         'reviewed_date': approval.approved_date})
             total_approved += e.amount
         elif approval and approval.status == 'denied':
-            rows.append({'expense': e, 'status': 'denied'})
+            rows.append({'expense': e, 'status': 'denied', 'submitted': e.created_date,
+                         'reviewed_date': approval.approved_date})
             total_denied += e.amount
     return rows, total_approved, total_denied
 
 
 def get_pending_expenses(employee):
     all_expenses = Expense.objects.filter(user_id=employee)
-    return [
-        e for e in all_expenses
-        if (a := Approval.objects.filter(expense_id=e).first()) and a.status == 'pending'
-    ]
+    pending = []
+    for e in all_expenses:
+        approval = Approval.objects.filter(expense_id=e).first()
+        if approval and approval.status == 'pending':
+            pending.append(e)
+    return pending
 
 
 def delete_pending_expense(employee, expense_id):
@@ -71,12 +77,9 @@ def get_pending_expense(employee, expense_id):
     return expense, approval
 
 
-def update_expense(expense, amount, description):
+def update_expense(expense, amount, description, category):
     expense.amount = amount
     expense.description = description
+    expense.category = category
     expense.save()
     return expense
-
-
-def authenticate_user(username, password):
-    return User.objects.filter(username=username, password=password).first()
