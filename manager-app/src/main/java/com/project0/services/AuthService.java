@@ -33,6 +33,11 @@ public class AuthService {
 
         }
 
+        if(!"manager".equalsIgnoreCase(user.getRole())){
+            throw new AuthenticationException("Username or password is incorrect");
+            
+        }
+
         return user;
 
 
