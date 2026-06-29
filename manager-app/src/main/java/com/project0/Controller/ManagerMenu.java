@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 public class ManagerMenu {
 
 
+
     private AuthService as=new AuthService();
     private ExpenseService es= new ExpenseService();
     private ApprovalService approvalService= new ApprovalService();
@@ -23,8 +24,23 @@ public class ManagerMenu {
     private Scanner scanner = new Scanner(System.in);
 
     public void start() {
-        login();
-        displayMenu();
+        boolean loggedIn = false;
+
+        for (int i = 0; i < 3; i++) {
+            if (login()) {
+                loggedIn = true;
+                break;
+            }
+            if (i < 1) {
+                System.out.println("Invalid credentials. Try again.");
+            }
+        }
+
+        if (loggedIn) {
+            displayMenu();
+        } else {
+            System.out.println("Too many failed attempts. Exiting.");
+        }
     }
 
     private boolean login() {
@@ -82,16 +98,19 @@ public class ManagerMenu {
 
     private void reportsMenu() {
         System.out.println("\n=== Reports ===");
-        System.out.println("1. By Employee");
-        System.out.println("2. By Date");
-        System.out.println("3. By Category");
-        System.out.println("4. Back");
+        System.out.println("1. All Employees");
+        System.out.println("2. By Employee");
+        System.out.println("3. By Date");
+        System.out.println("4. By Category");
+        System.out.println("5. Back");
         System.out.print("Choice: ");
         String choice = scanner.nextLine();
 
         List<Expenses> results;
 
         if (choice.equals("1")) {
+            results = es.getAllExpenses();
+        } else if (choice.equals("2")) {
             System.out.print("Enter employee ID: ");
             int employeeId;
             try {
@@ -101,15 +120,15 @@ public class ManagerMenu {
                 return;
             }
             results = es.getExpensesByEmployee(employeeId);
-        } else if (choice.equals("2")) {
+        } else if (choice.equals("3")) {
             System.out.print("Enter date (YYYY-MM-DD): ");
             String date = scanner.nextLine();
             results = es.getExpensesByDate(date);
-        } else if (choice.equals("3")) {
+        } else if (choice.equals("4")) {
             System.out.print("Enter category (MEALS/TRAVEL/OFFICE/OTHER): ");
             String category = scanner.nextLine();
             results = es.getExpensesByCategory(category);
-        } else if (choice.equals("4")) {
+        } else if (choice.equals("5")) {
             return;
         } else {
             System.out.println("Invalid option.");
@@ -121,13 +140,15 @@ public class ManagerMenu {
             return;
         }
 
+        System.out.printf("%-6s %-10s %-10s %-20s %-10s%n", "ID", "Employee", "Amount", "Description", "Date");
+        System.out.println("----------------------------------------------------------");
         BigDecimal total = BigDecimal.ZERO;
         for (Expenses e : results) {
-            System.out.printf("ID: %d | Employee: %d | Amount: %s | %s | %s%n",
+            System.out.printf("%-6d %-10d %-10s %-20s %-10s%n",
                     e.getId(), e.getUser_id(), e.getAmount(), e.getDescription(), e.getDate());
             total = total.add(e.getAmount());
         }
-        System.out.println("-----------------------------");
+        System.out.println("----------------------------------------------------------");
         System.out.printf("Total: %s%n", total);
     }
 
@@ -175,8 +196,10 @@ public class ManagerMenu {
             System.out.println("No pending expenses.");
             return;
         }
+        System.out.printf("%-6s %-10s %-10s %-20s %-10s%n", "ID", "Employee", "Amount", "Description", "Date");
+        System.out.println("----------------------------------------------------------");
         for (Expenses e : pending) {
-            System.out.printf("ID: %d | Employee: %d | Amount: %s | %s | %s%n",
+            System.out.printf("%-6d %-10d %-10s %-20s %-10s%n",
                     e.getId(), e.getUser_id(), e.getAmount(), e.getDescription(), e.getDate());
         }
     }
