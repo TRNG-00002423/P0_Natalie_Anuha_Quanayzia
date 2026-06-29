@@ -23,8 +23,8 @@ public class ManagerMenu {
     private Scanner scanner = new Scanner(System.in);
 
     public void start() {
-        login();
-        displayMenu();
+        if(login())
+            displayMenu();
     }
 
     private boolean login() {
@@ -38,12 +38,6 @@ public class ManagerMenu {
             currentUser = as.login(username, password);
         } catch (UserNotFoundException | AuthenticationException e) {
             System.out.println(e.getMessage());
-            return false;
-        }
-
-        if (!"manager".equalsIgnoreCase(currentUser.getRole())) {
-            System.out.println("This account is not a manager account.");
-            currentUser = null;
             return false;
         }
         return true;

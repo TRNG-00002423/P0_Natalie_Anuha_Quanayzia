@@ -38,28 +38,44 @@ def submit_expense(request):
     ExpenseService.submit_expense(employee, amount, description, category)
     return Response({'message': 'Expense submitted and pending review.'}, status=status.HTTP_201_CREATED)
 
+
 @api_view(['GET'])
 def view_expenses(request, user_id):
     employee = ExpenseService.get_user_by_id(user_id)
     rows = ExpenseService.get_expenses_with_status(employee)
-    data = [{'expense_id': r['expense'].id, 'amount': r['expense'].amount, 'category': r['expense'].category, 'description': r['expense'].description, 'status': r['status']} for r in rows]
+    data = []
+    for r in rows:
+        entry = {
+            'expense_id': r['expense'].id,
+            'amount': r['expense'].amount,
+            'category': r['expense'].category,
+            'description': r['expense'].description,
+            'status': r['status'],
+            'submitted': r['submitted'],
+        }
+        if r['status'] != 'pending':
+            entry['reviewed_date'] = r['reviewed_date']
+        data.append(entry)
     return Response(data)
+
 
 @api_view(['GET'])
 def view_history(request, user_id):
     employee = ExpenseService.get_user_by_id(user_id)
     rows, total_approved, total_denied = ExpenseService.get_expense_history(employee)
-    data = [{'expense_id': r['expense'].id, 'amount': r['expense'].amount, 'category': r['expense'].category, 'description': r['expense'].description, 'status': r['status']} for r in rows]
+    data = [{'expense_id': r['expense'].id, 'amount': r['expense'].amount, 'category': r['expense'].category, 'description': r['expense'].description, 'status': r['status'], 'submitted': r['submitted'], 'reviewed_date': r['reviewed_date']} for r in rows]
     return Response({'expenses': data, 'total_approved': total_approved, 'total_denied': total_denied})
+
 
 @api_view(['GET'])
 def get_pending_expenses(request, user_id):
     employee = ExpenseService.get_user_by_id(user_id)
     expenses = ExpenseService.get_pending_expenses(employee)
-    data = [{'expense_id': e.id, 'amount': e.amount, 'category':e.category, 'description': e.description} for e in expenses]
+    data = [{'expense_id': e.id, 'amount': e.amount, 'category': e.category, 'description': e.description, 'submitted': e.created_date} for e in expenses]
     return Response(data)
 
 
+# views.py
 @api_view(['PUT'])
 def edit_expense(request, user_id, expense_id):
     employee = ExpenseService.get_user_by_id(user_id)
@@ -69,6 +85,7 @@ def edit_expense(request, user_id, expense_id):
 
     amount = request.data.get('amount')
     description = request.data.get('description')
+    category = request.data.get('category')
 
     try:
         amount = float(amount)
@@ -77,9 +94,8 @@ def edit_expense(request, user_id, expense_id):
     if amount <= 0:
         return Response({'error': 'Amount must be greater than zero.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    ExpenseService.update_expense(expense, amount, description)
+    ExpenseService.update_expense(expense, amount, description, category)
     return Response({'message': 'Expense updated.'})
-
 
 @api_view(['DELETE'])
 def delete_expense(request, user_id, expense_id):
