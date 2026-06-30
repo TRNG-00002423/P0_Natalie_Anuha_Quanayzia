@@ -159,6 +159,11 @@ public class ManagerMenu {
             return;
         }
 
+        if (es.getExpenseById(expenseId) == null) {
+            System.out.println("No expense found with ID " + expenseId + ".");
+            return;
+        }
+
         System.out.print("Approve or Deny? (a/d): ");
         String choice = scanner.nextLine().trim().toLowerCase();
 
