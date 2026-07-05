@@ -1,11 +1,14 @@
 import subprocess
 from pathlib import Path
 from employee import employee_login
+from rich.console import Console
 
+
+console = Console()
 
 def main():
     while True:
-        print("\n--- Revature Expense Manager ---")
+        console.print("\n[bold]--- Revature Expense Manager ---[/bold]")
         print("1. Employee Portal")
         print("2. Manager Portal")
         print("3. Exit")
@@ -17,13 +20,12 @@ def main():
 
         choice = input("Select an option: ").strip()
         if choice == "3":
-            print("Goodbye.")
+            console.print("[yellow]Goodbye.[/yellow]")
             break
         elif choice in options:
             options[choice]()
         else:
-            print("Invalid option, please try again.")
-
+            console.print("[red]Invalid option, please try again.[/red]")
 
 def launch_manager_portal():
     # Directory containing this Python file
