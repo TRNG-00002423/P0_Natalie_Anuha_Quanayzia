@@ -14,7 +14,7 @@ def login(request):
         )
     except AuthenticationError as e:
         return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
-    return Response({'user_id': user.id})
+    return Response({'user_id': user.id, "username": user.username})
 
 
 @api_view(['POST'])
