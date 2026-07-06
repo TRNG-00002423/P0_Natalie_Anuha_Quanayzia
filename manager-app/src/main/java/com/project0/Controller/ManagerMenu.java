@@ -15,7 +15,9 @@ import java.math.BigDecimal;
 
 public class ManagerMenu {
 
-
+    private static final String GREEN = (char) 27 + "[32m";
+    private static final String RED = (char) 27 + "[31m";
+    private static final String RESET = (char) 27 + "[0m";
 
     private AuthService as=new AuthService();
     private ExpenseService es= new ExpenseService();
@@ -183,9 +185,13 @@ public class ManagerMenu {
         Approvals result = approvalService.reviewExpense(expenseId, currentUser.getId(), status, comment);
 
         if (result != null) {
-            System.out.println("Expense #" + expenseId + " has been " + result.getStatus() + ".");
+            String color = RED;
+            if (result.getStatus().equals("approved")) {
+                color = GREEN;
+            }
+            System.out.println(color + "Expense #" + expenseId + " has been " + result.getStatus() + "." + RESET);
         } else {
-            System.out.println("Could not update — no approval found for that expense.");
+            System.out.println(RED + "Could not update — no approval found for that expense." + RESET);
         }
     }
 

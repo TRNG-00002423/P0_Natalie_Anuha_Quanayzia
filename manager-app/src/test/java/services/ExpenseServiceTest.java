@@ -1,4 +1,4 @@
-package service;
+package services;
 
 import com.project0.model.Expenses;
 import com.project0.services.ExpenseService;
@@ -75,6 +75,11 @@ public class ExpenseServiceTest {
     private void cleanupTestRows() throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(
+                    "DELETE FROM ExpenseManager_approval WHERE expense_id_id IN (SELECT id FROM ExpenseManager_expense WHERE description = ?)")) {
+                stmt.setString(1, TEST_DESCRIPTION);
+                stmt.executeUpdate();
+            }
+            try (PreparedStatement stmt = conn.prepareStatement(
                     "DELETE FROM ExpenseManager_expense WHERE description = ?")) {
                 stmt.setString(1, TEST_DESCRIPTION);
                 stmt.executeUpdate();
@@ -117,5 +122,19 @@ public class ExpenseServiceTest {
                 .anyMatch(e -> e.getDescription().equals("integration_test_expense")));
     }
 
+    @Test
+    void getPendingExpenses_includesOurPendingExpense() throws SQLException {
+        // give our test expense a pending approval so it counts as pending
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO ExpenseManager_approval (expense_id_id, status, comment) VALUES (?, 'pending', '')")) {
+            stmt.setInt(1, insertedExpenseId);
+            stmt.executeUpdate();
+        }
+
+        List<Expenses> pending = expenseService.getPendingExpenses();
+        boolean found = pending.stream().anyMatch(e -> e.getId() == insertedExpenseId);
+        assertTrue(found);
+    }
 
 }
