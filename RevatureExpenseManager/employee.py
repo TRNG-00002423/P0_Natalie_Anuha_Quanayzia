@@ -50,6 +50,7 @@ def employee_menu():
 
         choice = input("Select an option: ").strip()
         if choice == "7":
+            requests.post(f"{BASE_URL}/logout/", json={"user_id": user_id})
             console.print(f"[yellow] {username} has been logged out.[/yellow]")
             user_id = None
             username=None

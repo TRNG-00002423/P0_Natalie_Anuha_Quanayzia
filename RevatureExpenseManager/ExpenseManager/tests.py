@@ -1,6 +1,9 @@
+import json
+import bcrypt
+
 from django.test import TestCase
 from django.utils import timezone
-from .models import User,Expense, Approval 
+from .models import User, Expense, Approval
 
 
 class ModelTests(TestCase):
@@ -45,9 +48,38 @@ class ModelTests(TestCase):
         self.assertEqual(retrieved_approval.status, "pending")
 
 
-   
+class LoginApiTests(TestCase):
 
+    LOGIN_URL = "/ExpenseManager/login/"
 
+    def setUp(self):
+        hashed = bcrypt.hashpw(b"pass", bcrypt.gensalt()).decode()
+        User.objects.create(username="employee1", password=hashed, role="employee")
 
+    def test_login_valid_returns_200(self):
+        response = self.client.post(
+            self.LOGIN_URL,
+            data=json.dumps({"username": "employee1", "password": "pass"}),
+            content_type="application/json",
+        )
 
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["username"], "employee1")
 
+    def test_login_wrong_password_returns_401(self):
+        response = self.client.post(
+            self.LOGIN_URL,
+            data=json.dumps({"username": "employee1", "password": "wrongpass"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_login_unknown_user_returns_401(self):
+        response = self.client.post(
+            self.LOGIN_URL,
+            data=json.dumps({"username": "nobody", "password": "pass"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 401)

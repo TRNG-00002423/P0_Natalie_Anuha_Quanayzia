@@ -1,20 +1,34 @@
+import logging
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .service import ExpenseService, AuthenticationService
 from .exceptions.AuthenticationError import AuthenticationError
 
+logger = logging.getLogger('expensemanager')
+
 
 @api_view(['POST'])
 def login(request):
+    username = request.data.get('username')
     try:
         user = AuthenticationService.login(
-            request.data.get('username'),
+            username,
             request.data.get('password')
         )
     except AuthenticationError as e:
+        logger.warning(f"Login failed: username '{username}'")
         return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+    logger.info(f"Login success: {user.username} (id {user.id})")
     return Response({'user_id': user.id, "username": user.username})
+
+
+@api_view(['POST'])
+def logout(request):
+    user_id = request.data.get('user_id')
+    logger.info(f"Logout: user {user_id}")
+    return Response({'message': 'Logged out.'})
 
 
 @api_view(['POST'])
@@ -36,6 +50,7 @@ def submit_expense(request):
 
     employee = ExpenseService.get_user_by_id(user_id)
     ExpenseService.submit_expense(employee, amount, description, category)
+    logger.info(f"Expense submitted by user {user_id}: {amount} {category}")
     return Response({'message': 'Expense submitted and pending review.'}, status=status.HTTP_201_CREATED)
 
 
@@ -81,6 +96,7 @@ def edit_expense(request, user_id, expense_id):
     employee = ExpenseService.get_user_by_id(user_id)
     expense, _ = ExpenseService.get_pending_expense(employee, expense_id)
     if not expense:
+        logger.warning(f"Edit failed: expense {expense_id} not editable for user {user_id}")
         return Response({'error': 'Expense not found or not editable.'}, status=status.HTTP_404_NOT_FOUND)
 
     amount = request.data.get('amount')
@@ -95,6 +111,7 @@ def edit_expense(request, user_id, expense_id):
         return Response({'error': 'Amount must be greater than zero.'}, status=status.HTTP_400_BAD_REQUEST)
 
     ExpenseService.update_expense(expense, amount, description, category)
+    logger.info(f"Expense {expense_id} edited by user {user_id}: amount={amount}, category={category}, description='{description}'")
     return Response({'message': 'Expense updated.'})
 
 @api_view(['DELETE'])
@@ -102,5 +119,7 @@ def delete_expense(request, user_id, expense_id):
     employee = ExpenseService.get_user_by_id(user_id)
     deleted = ExpenseService.delete_pending_expense(employee, expense_id)
     if deleted:
+        logger.info(f"Expense {expense_id} deleted by user {user_id}")
         return Response({'message': 'Expense deleted.'})
+    logger.warning(f"Delete failed: expense {expense_id} not deletable for user {user_id}")
     return Response({'error': 'Expense not found or not deletable.'}, status=status.HTTP_404_NOT_FOUND)

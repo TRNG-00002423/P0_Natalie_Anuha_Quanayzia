@@ -49,5 +49,8 @@ __pycache__/
 db.sqlite3
 seed.py
 
+# Log files
+*.log
+
 ### Mac OS ###
 .DS_Store
