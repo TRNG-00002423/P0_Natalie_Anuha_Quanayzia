@@ -2,14 +2,19 @@ package com.project0.repository;
 
 import com.project0.model.Approvals;
 import com.project0.util.DatabaseConnection;
+import com.project0.util.AppLogger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ApprovalsDAOImpl implements ApprovalsDAO {
+
+    private static final Logger logger = AppLogger.getLogger();
     @Override
     public Approvals approveOrDenyExpense(int expense_id, int reviewer_id, String status, String comment) {
         String sqlUpdate =
@@ -31,7 +36,7 @@ public class ApprovalsDAOImpl implements ApprovalsDAO {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
         }
 
         return getApprovalByExpenseId(expense_id);
@@ -59,7 +64,7 @@ public class ApprovalsDAOImpl implements ApprovalsDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
         }
 
         return null;
@@ -87,7 +92,7 @@ public class ApprovalsDAOImpl implements ApprovalsDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
         }
 
         return null;
@@ -115,7 +120,7 @@ public class ApprovalsDAOImpl implements ApprovalsDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
         }
 
         return null;

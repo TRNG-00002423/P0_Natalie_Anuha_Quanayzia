@@ -77,7 +77,35 @@ public class AuthServiceTest {
                 () -> authService.login("definitely_not_a_real_user_98765", "anyPassword"));
     }
 
+    @Test
+    void login_nonManager_throwsAuthenticationException() throws SQLException {
+        String employeeUsername = "test_employee_login";
+        deleteEmployee(employeeUsername);
 
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO ExpenseManager_user (username, password, role) VALUES (?, ?, ?)")) {
+            stmt.setString(1, employeeUsername);
+            stmt.setString(2, TEST_PASSWORD);
+            stmt.setString(3, "EMPLOYEE");
+            stmt.executeUpdate();
+        }
+
+
+        assertThrows(AuthenticationException.class,
+                () -> authService.login(employeeUsername, TEST_PASSWORD));
+
+        deleteEmployee(employeeUsername);
+    }
+
+    private void deleteEmployee(String username) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "DELETE FROM ExpenseManager_user WHERE username = ?")) {
+            stmt.setString(1, username);
+            stmt.executeUpdate();
+        }
+    }
 
 }
 

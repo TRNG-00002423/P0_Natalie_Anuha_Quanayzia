@@ -2,6 +2,7 @@ package com.project0.repository;
 
 import com.project0.model.Expenses;
 import com.project0.util.DatabaseConnection;
+import com.project0.util.AppLogger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,8 +10,12 @@ import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ExpensesDAOImpl implements ExpensesDAO {
+
+    private static final Logger logger = AppLogger.getLogger();
 
     @Override
     public Expenses getExpenseByID(int expense_id) {
@@ -27,7 +32,7 @@ public class ExpensesDAOImpl implements ExpensesDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
         }
 
         return null;
@@ -47,7 +52,7 @@ public class ExpensesDAOImpl implements ExpensesDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
         }
 
         return expenses;
@@ -68,7 +73,7 @@ public class ExpensesDAOImpl implements ExpensesDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
         }
 
         return expenses;
@@ -89,7 +94,7 @@ public class ExpensesDAOImpl implements ExpensesDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
         }
 
         return expenses;
@@ -111,7 +116,7 @@ public class ExpensesDAOImpl implements ExpensesDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
         }
 
         return expenses;
@@ -132,7 +137,7 @@ public class ExpensesDAOImpl implements ExpensesDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
         }
 
         return expenses;

@@ -5,6 +5,10 @@ target/
 .kotlin
 dependency-reduced-pom.xml
 
+### Log files ###
+*.log
+*.log.*
+
 ### IntelliJ IDEA ###
 ../.idea/
 .idea/modules.xml
