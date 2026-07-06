@@ -28,10 +28,10 @@ def main():
 
 
 def launch_manager_portal():
-    # Directory containing this Python file
+    # Directory containing this Python file (Project Root)
     base_dir = Path(__file__).resolve().parent
 
-    # Go up one directory, then into manager-app/target
+    # Path to the manager app JAR file
     jar_path = (
         base_dir
         / "manager-app"
@@ -40,8 +40,10 @@ def launch_manager_portal():
     )
 
     try:
+        # Added cwd=str(base_dir) to lock the working directory to the project root
         subprocess.run(
             ["java", "-jar", str(jar_path)],
+            cwd=str(base_dir),
             check=True
         )
     except FileNotFoundError:

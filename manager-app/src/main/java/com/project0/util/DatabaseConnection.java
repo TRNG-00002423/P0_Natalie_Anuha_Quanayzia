@@ -13,15 +13,19 @@ public class DatabaseConnection {
     private static final String URL;
 
     static {
-        Path dbPath = Paths.get(
-                System.getProperty("user.dir"),
-                "..",
-                "RevatureExpenseManager",
-                "db.sqlite3"
-        ).normalize();
+    String userDir = System.getProperty("user.dir");
+    Path dbPath;
 
-        URL = "jdbc:sqlite:" + dbPath;
+    // Check if we are already running from the root project folder
+    if (userDir.endsWith("P0_Natalie_Anuha_Quanayzia")) {
+        dbPath = Paths.get(userDir, "RevatureExpenseManager", "db.sqlite3").normalize();
+    } else {
+        // Fallback for when running tests locally from inside /manager-app
+        dbPath = Paths.get(userDir, "..", "RevatureExpenseManager", "db.sqlite3").normalize();
     }
+
+    URL = "jdbc:sqlite:" + dbPath.toString();
+}
     private static Connection connection=null;
 
     //Singleton - one connection for the apps lifetime

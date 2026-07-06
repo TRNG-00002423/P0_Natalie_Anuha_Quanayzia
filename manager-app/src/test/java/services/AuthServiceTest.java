@@ -44,6 +44,7 @@ public class AuthServiceTest {
     @AfterEach
     void tearDown() throws SQLException {
         deleteTestUser();
+        DatabaseConnection.closeConnection();
     }
 
     private void deleteTestUser() throws SQLException {
@@ -86,7 +87,7 @@ public class AuthServiceTest {
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO ExpenseManager_user (username, password, role) VALUES (?, ?, ?)")) {
             stmt.setString(1, employeeUsername);
-            stmt.setString(2, TEST_PASSWORD);
+            stmt.setString(2, hashedPassword);
             stmt.setString(3, "EMPLOYEE");
             stmt.executeUpdate();
         }
