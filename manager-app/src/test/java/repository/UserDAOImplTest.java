@@ -45,6 +45,7 @@ public class UserDAOImplTest {
     @AfterEach
     void tearDown() throws SQLException {
         deleteTestUser();
+         DatabaseConnection.closeConnection();
     }
 
     private void deleteTestUser() throws SQLException {

@@ -53,6 +53,7 @@ public class ExpenseServiceTest {
     @AfterEach
     void tearDown() throws SQLException {
         cleanupTestRows();
+        DatabaseConnection.closeConnection();
     }
 
     private int insertTestUser() throws SQLException {
