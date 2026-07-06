@@ -1,0 +1,136 @@
+Jul 06, 2026 1:07:56 PM com.project0.repository.UserDAOImpl getUserByUsername
+SEVERE: Database error: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+java.sql.SQLException: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+	at org.sqlite.SQLiteConnection.open(SQLiteConnection.java:261)
+	at org.sqlite.SQLiteConnection.<init>(SQLiteConnection.java:67)
+	at org.sqlite.jdbc3.JDBC3Connection.<init>(JDBC3Connection.java:28)
+	at org.sqlite.jdbc4.JDBC4Connection.<init>(JDBC4Connection.java:19)
+	at org.sqlite.JDBC.createConnection(JDBC.java:106)
+	at org.sqlite.JDBC.connect(JDBC.java:79)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)
+	at com.project0.util.DatabaseConnection.getConnection(DatabaseConnection.java:30)
+	at com.project0.repository.UserDAOImpl.getUserByUsername(UserDAOImpl.java:22)
+	at com.project0.services.AuthService.login(AuthService.java:21)
+	at com.project0.Controller.ManagerMenu.login(ManagerMenu.java:57)
+	at com.project0.Controller.ManagerMenu.start(ManagerMenu.java:33)
+	at com.project0.Main.main(Main.java:10)
+
+Jul 06, 2026 1:07:56 PM com.project0.services.AuthService login
+WARNING: Login failed: unknown user 'manager'
+Jul 06, 2026 1:10:34 PM com.project0.repository.UserDAOImpl getUserByUsername
+SEVERE: Database error: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+java.sql.SQLException: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+	at org.sqlite.SQLiteConnection.open(SQLiteConnection.java:261)
+	at org.sqlite.SQLiteConnection.<init>(SQLiteConnection.java:67)
+	at org.sqlite.jdbc3.JDBC3Connection.<init>(JDBC3Connection.java:28)
+	at org.sqlite.jdbc4.JDBC4Connection.<init>(JDBC4Connection.java:19)
+	at org.sqlite.JDBC.createConnection(JDBC.java:106)
+	at org.sqlite.JDBC.connect(JDBC.java:79)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)
+	at com.project0.util.DatabaseConnection.getConnection(DatabaseConnection.java:30)
+	at com.project0.repository.UserDAOImpl.getUserByUsername(UserDAOImpl.java:22)
+	at com.project0.services.AuthService.login(AuthService.java:21)
+	at com.project0.Controller.ManagerMenu.login(ManagerMenu.java:57)
+	at com.project0.Controller.ManagerMenu.start(ManagerMenu.java:33)
+	at com.project0.Main.main(Main.java:10)
+
+Jul 06, 2026 1:10:34 PM com.project0.services.AuthService login
+WARNING: Login failed: unknown user 'manager'
+Jul 06, 2026 1:16:34 PM com.project0.repository.UserDAOImpl getUserByUsername
+SEVERE: Database error: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+java.sql.SQLException: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+	at org.sqlite.SQLiteConnection.open(SQLiteConnection.java:261)
+	at org.sqlite.SQLiteConnection.<init>(SQLiteConnection.java:67)
+	at org.sqlite.jdbc3.JDBC3Connection.<init>(JDBC3Connection.java:28)
+	at org.sqlite.jdbc4.JDBC4Connection.<init>(JDBC4Connection.java:19)
+	at org.sqlite.JDBC.createConnection(JDBC.java:106)
+	at org.sqlite.JDBC.connect(JDBC.java:79)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)
+	at com.project0.util.DatabaseConnection.getConnection(DatabaseConnection.java:30)
+	at com.project0.repository.UserDAOImpl.getUserByUsername(UserDAOImpl.java:22)
+	at com.project0.services.AuthService.login(AuthService.java:21)
+	at com.project0.Controller.ManagerMenu.login(ManagerMenu.java:57)
+	at com.project0.Controller.ManagerMenu.start(ManagerMenu.java:33)
+	at com.project0.Main.main(Main.java:10)
+
+Jul 06, 2026 1:16:34 PM com.project0.services.AuthService login
+WARNING: Login failed: unknown user 'alice'
+Jul 06, 2026 1:22:26 PM com.project0.repository.UserDAOImpl getUserByUsername
+SEVERE: Database error: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+java.sql.SQLException: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+	at org.sqlite.SQLiteConnection.open(SQLiteConnection.java:261)
+	at org.sqlite.SQLiteConnection.<init>(SQLiteConnection.java:67)
+	at org.sqlite.jdbc3.JDBC3Connection.<init>(JDBC3Connection.java:28)
+	at org.sqlite.jdbc4.JDBC4Connection.<init>(JDBC4Connection.java:19)
+	at org.sqlite.JDBC.createConnection(JDBC.java:106)
+	at org.sqlite.JDBC.connect(JDBC.java:79)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)
+	at com.project0.util.DatabaseConnection.getConnection(DatabaseConnection.java:30)
+	at com.project0.repository.UserDAOImpl.getUserByUsername(UserDAOImpl.java:22)
+	at com.project0.services.AuthService.login(AuthService.java:21)
+	at com.project0.Controller.ManagerMenu.login(ManagerMenu.java:57)
+	at com.project0.Controller.ManagerMenu.start(ManagerMenu.java:33)
+	at com.project0.Main.main(Main.java:10)
+
+Jul 06, 2026 1:22:26 PM com.project0.services.AuthService login
+WARNING: Login failed: unknown user 'manager'
+Jul 06, 2026 1:30:10 PM com.project0.repository.UserDAOImpl getUserByUsername
+SEVERE: Database error: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+java.sql.SQLException: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+	at org.sqlite.SQLiteConnection.open(SQLiteConnection.java:261)
+	at org.sqlite.SQLiteConnection.<init>(SQLiteConnection.java:67)
+	at org.sqlite.jdbc3.JDBC3Connection.<init>(JDBC3Connection.java:28)
+	at org.sqlite.jdbc4.JDBC4Connection.<init>(JDBC4Connection.java:19)
+	at org.sqlite.JDBC.createConnection(JDBC.java:106)
+	at org.sqlite.JDBC.connect(JDBC.java:79)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)
+	at com.project0.util.DatabaseConnection.getConnection(DatabaseConnection.java:30)
+	at com.project0.repository.UserDAOImpl.getUserByUsername(UserDAOImpl.java:22)
+	at com.project0.services.AuthService.login(AuthService.java:51)
+	at com.project0.Controller.ManagerMenu.login(ManagerMenu.java:57)
+	at com.project0.Controller.ManagerMenu.start(ManagerMenu.java:33)
+	at com.project0.Main.main(Main.java:10)
+
+Jul 06, 2026 1:32:15 PM com.project0.repository.UserDAOImpl getUserByUsername
+SEVERE: Database error: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+java.sql.SQLException: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+	at org.sqlite.SQLiteConnection.open(SQLiteConnection.java:261)
+	at org.sqlite.SQLiteConnection.<init>(SQLiteConnection.java:67)
+	at org.sqlite.jdbc3.JDBC3Connection.<init>(JDBC3Connection.java:28)
+	at org.sqlite.jdbc4.JDBC4Connection.<init>(JDBC4Connection.java:19)
+	at org.sqlite.JDBC.createConnection(JDBC.java:106)
+	at org.sqlite.JDBC.connect(JDBC.java:79)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)
+	at com.project0.util.DatabaseConnection.getConnection(DatabaseConnection.java:30)
+	at com.project0.repository.UserDAOImpl.getUserByUsername(UserDAOImpl.java:22)
+	at com.project0.services.AuthService.login(AuthService.java:51)
+	at com.project0.Controller.ManagerMenu.login(ManagerMenu.java:57)
+	at com.project0.Controller.ManagerMenu.start(ManagerMenu.java:33)
+	at com.project0.Main.main(Main.java:10)
+
+Jul 06, 2026 1:32:21 PM com.project0.repository.UserDAOImpl getUserByUsername
+SEVERE: Database error: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+java.sql.SQLException: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager\db.sqlite3': 'C:\Users\qjgar\Documents\Revature\RevatureExpenseManager' does not exist
+	at org.sqlite.SQLiteConnection.open(SQLiteConnection.java:261)
+	at org.sqlite.SQLiteConnection.<init>(SQLiteConnection.java:67)
+	at org.sqlite.jdbc3.JDBC3Connection.<init>(JDBC3Connection.java:28)
+	at org.sqlite.jdbc4.JDBC4Connection.<init>(JDBC4Connection.java:19)
+	at org.sqlite.JDBC.createConnection(JDBC.java:106)
+	at org.sqlite.JDBC.connect(JDBC.java:79)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)
+	at com.project0.util.DatabaseConnection.getConnection(DatabaseConnection.java:30)
+	at com.project0.repository.UserDAOImpl.getUserByUsername(UserDAOImpl.java:22)
+	at com.project0.services.AuthService.login(AuthService.java:51)
+	at com.project0.Controller.ManagerMenu.login(ManagerMenu.java:57)
+	at com.project0.Controller.ManagerMenu.start(ManagerMenu.java:33)
+	at com.project0.Main.main(Main.java:10)
+
+Jul 06, 2026 1:37:15 PM com.project0.services.AuthService login
+INFO: Login success: user 'manager'

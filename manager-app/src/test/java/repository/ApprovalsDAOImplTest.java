@@ -77,6 +77,7 @@ public class ApprovalsDAOImplTest {
     @AfterEach
     void tearDown() throws SQLException {
         deleteTestData();
+        DatabaseConnection.closeConnection();
     }
 
     private void deleteTestData() throws SQLException {

@@ -25,8 +25,11 @@ public class AuthService {
             throw new UserNotFoundException("Username or password is incorrect");
         }
 
-        String storedPassword = user.getPassword().replace("$2b$", "$2a$");
-        if (!BCrypt.checkpw(password, storedPassword)) {
+        String storedPassword = user.getPassword().trim().replace("$2b$", "$2a$");
+
+        String cleanPassword = password != null ? password.trim() : "";
+
+        if (!BCrypt.checkpw(cleanPassword, storedPassword)) {
             logger.warning("Login failed: wrong password for user '" + username + "'");
             throw new AuthenticationException("Username or password is incorrect");
         }
