@@ -1,5 +1,7 @@
 import subprocess
 from pathlib import Path
+import sys
+sys.path.append('RevatureExpenseManager')
 from employee import employee_login
 
 
@@ -31,7 +33,7 @@ def launch_manager_portal():
 
     # Go up one directory, then into manager-app/target
     jar_path = (
-        base_dir.parent
+        base_dir
         / "manager-app"
         / "target"
         / "manager-app-1.0-SNAPSHOT.jar"
