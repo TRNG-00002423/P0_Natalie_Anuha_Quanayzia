@@ -8,6 +8,7 @@ import com.project0.util.DatabaseConnection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,6 +23,7 @@ public class AuthServiceTest {
     private static final String TEST_ROLE = "MANAGER";
 
     private AuthService authService;
+    String hashedPassword = BCrypt.hashpw(TEST_PASSWORD, BCrypt.gensalt());
 
 
     @BeforeEach
@@ -33,7 +35,7 @@ public class AuthServiceTest {
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO ExpenseManager_user (username, password, role) VALUES (?, ?, ?)")) {
             stmt.setString(1, TEST_USERNAME);
-            stmt.setString(2, TEST_PASSWORD);
+            stmt.setString(2, hashedPassword);
             stmt.setString(3, TEST_ROLE);
             stmt.executeUpdate();
         }
