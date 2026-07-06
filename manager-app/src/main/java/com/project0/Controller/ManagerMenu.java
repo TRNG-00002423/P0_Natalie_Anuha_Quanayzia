@@ -17,6 +17,8 @@ public class ManagerMenu {
 
     private static final String GREEN = (char) 27 + "[32m";
     private static final String RED = (char) 27 + "[31m";
+    private static final String CYAN = (char) 27 + "[36m";
+    private static final String BOLD = (char) 27 + "[1m";
     private static final String RESET = (char) 27 + "[0m";
 
     private AuthService as=new AuthService();
@@ -67,7 +69,7 @@ public class ManagerMenu {
         boolean running=true;
 
         while(running){
-            System.out.println("\n=== Manager Menu ===");
+            System.out.println("\n" + CYAN + "=== Manager Menu ===" + RESET);
             System.out.println("1. View Pending Expenses");
             System.out.println("2. Review an Expense (Approve/Deny)");
             System.out.println("3. Generate Reports");
@@ -94,7 +96,7 @@ public class ManagerMenu {
     }
 
     private void reportsMenu() {
-        System.out.println("\n=== Reports ===");
+        System.out.println("\n" + CYAN + "=== Reports ===" + RESET);
         System.out.println("1. All Employees");
         System.out.println("2. By Employee");
         System.out.println("3. By Date");
@@ -108,7 +110,7 @@ public class ManagerMenu {
         if (choice.equals("1")) {
             results = es.getAllExpenses();
         } else if (choice.equals("2")) {
-            System.out.print("Enter employee ID: ");
+            System.out.print("Enter employee ID (0 to go back): ");
             int employeeId;
             try {
                 employeeId = Integer.parseInt(scanner.nextLine());
@@ -116,14 +118,23 @@ public class ManagerMenu {
                 System.out.println("Invalid ID — please enter a number.");
                 return;
             }
+            if (employeeId == 0) {
+                return;
+            }
             results = es.getExpensesByEmployee(employeeId);
         } else if (choice.equals("3")) {
-            System.out.print("Enter date (YYYY-MM-DD): ");
-            String date = scanner.nextLine();
+            System.out.print("Enter date (YYYY-MM-DD, blank to go back): ");
+            String date = scanner.nextLine().trim();
+            if (date.isBlank()) {
+                return;
+            }
             results = es.getExpensesByDate(date);
         } else if (choice.equals("4")) {
-            System.out.print("Enter category (MEALS/TRAVEL/OFFICE/OTHER): ");
-            String category = scanner.nextLine();
+            System.out.print("Enter category (MEALS/TRAVEL/LODGING/OFFICE/OTHER, blank to go back): ");
+            String category = scanner.nextLine().trim().toUpperCase();
+            if (category.isBlank()) {
+                return;
+            }
             results = es.getExpensesByCategory(category);
         } else if (choice.equals("5")) {
             return;
@@ -137,22 +148,22 @@ public class ManagerMenu {
             return;
         }
 
-        System.out.printf("%-6s %-10s %-10s %-20s %-10s%n", "ID", "Employee", "Amount", "Description", "Date");
+        System.out.printf(CYAN + "%-6s %-10s %-10s %-20s %-10s" + RESET + "%n", "ID", "Employee", "Amount", "Description", "Date");
         System.out.println("----------------------------------------------------------");
         BigDecimal total = BigDecimal.ZERO;
         for (Expenses e : results) {
             System.out.printf("%-6d %-10d %-10s %-20s %-10s%n",
-                    e.getId(), e.getUser_id(), e.getAmount(), e.getDescription(), e.getDate());
+                    e.getId(), e.getUser_id(), money(e.getAmount()), e.getDescription(), e.getDate());
             total = total.add(e.getAmount());
         }
         System.out.println("----------------------------------------------------------");
-        System.out.printf("Total: %s%n", total);
+        System.out.printf(BOLD + "Total: %s" + RESET + "%n", money(total));
     }
 
     private void reviewExpense() {
         viewPendingExpenses();
 
-        System.out.print("Enter the expense ID to review: ");
+        System.out.print("Enter the expense ID to review (0 to go back): ");
         int expenseId;
         try {
             expenseId = Integer.parseInt(scanner.nextLine());
@@ -161,13 +172,20 @@ public class ManagerMenu {
             return;
         }
 
+        if (expenseId == 0) {
+            return;
+        }
+
         if (es.getExpenseById(expenseId) == null) {
             System.out.println("No expense found with ID " + expenseId + ".");
             return;
         }
 
-        System.out.print("Approve or Deny? (a/d): ");
+        System.out.print("Approve or Deny? (a/d, blank to go back): ");
         String choice = scanner.nextLine().trim().toLowerCase();
+        if (choice.isBlank()) {
+            return;
+        }
 
         String status;
         if (choice.equals("a")) {
@@ -202,13 +220,16 @@ public class ManagerMenu {
             System.out.println("No pending expenses.");
             return;
         }
-        System.out.printf("%-6s %-10s %-10s %-20s %-10s%n", "ID", "Employee", "Amount", "Description", "Date");
+        System.out.printf(CYAN + "%-6s %-10s %-10s %-20s %-10s" + RESET + "%n", "ID", "Employee", "Amount", "Description", "Date");
         System.out.println("----------------------------------------------------------");
         for (Expenses e : pending) {
             System.out.printf("%-6d %-10d %-10s %-20s %-10s%n",
-                    e.getId(), e.getUser_id(), e.getAmount(), e.getDescription(), e.getDate());
+                    e.getId(), e.getUser_id(), money(e.getAmount()), e.getDescription(), e.getDate());
         }
     }
 
+    private String money(BigDecimal amount) {
+        return String.format("$%.2f", amount);
+    }
 
 }

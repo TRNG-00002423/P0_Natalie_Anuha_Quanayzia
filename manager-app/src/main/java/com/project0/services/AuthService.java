@@ -7,10 +7,13 @@ import com.project0.repository.UserDAO;
 import com.project0.repository.UserDAOImpl;
 import com.project0.util.AppLogger;
 import org.mindrot.jbcrypt.BCrypt;
+
 import java.util.logging.Logger;
 
 public class AuthService {
+
     private static final Logger logger = AppLogger.getLogger();
+
     UserDAO ud;
 
     public AuthService() {
@@ -18,6 +21,7 @@ public class AuthService {
     }
 
     public Users login(String username, String password) {
+
         Users user = ud.getUserByUsername(username);
 
         if (user == null) {

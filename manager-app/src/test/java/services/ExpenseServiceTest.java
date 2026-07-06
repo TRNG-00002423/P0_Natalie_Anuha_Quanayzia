@@ -18,6 +18,7 @@ public class ExpenseServiceTest {
     private static final String TEST_DATE = "2026-06-01";
     private static final String TEST_USERNAME = "integration_test_employee";
     private static final String TEST_DESCRIPTION = "integration_test_expense";
+    private static final String TEST_CATEGORY = "MEALS";
 
     private ExpenseService expenseService;
     private int testUserId;
@@ -39,7 +40,7 @@ public class ExpenseServiceTest {
             stmt.setBigDecimal(2, new BigDecimal("42.50"));
             stmt.setString(3, TEST_DESCRIPTION);
             stmt.setString(4, TEST_DATE);
-            stmt.setString(5, TEST_DATE);
+            stmt.setString(5, TEST_CATEGORY);
             stmt.executeUpdate();
 
             try (ResultSet keys = stmt.getGeneratedKeys()) {
@@ -136,6 +137,14 @@ public class ExpenseServiceTest {
         List<Expenses> pending = expenseService.getPendingExpenses();
         boolean found = pending.stream().anyMatch(e -> e.getId() == insertedExpenseId);
         assertTrue(found);
+    }
+
+    @Test
+    void getExpensesByCategory_returnsInsertedExpense() {
+        List<Expenses> result = expenseService.getExpensesByCategory(TEST_CATEGORY);
+
+        assertTrue(result.stream()
+                .anyMatch(e -> e.getDescription().equals("integration_test_expense")));
     }
 
 }
