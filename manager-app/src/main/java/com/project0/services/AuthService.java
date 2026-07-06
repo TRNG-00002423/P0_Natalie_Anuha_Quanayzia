@@ -15,22 +15,23 @@ public class AuthService {
         this.ud = new UserDAOImpl();
     }
 
-    public Users login(String username, String password) {
+   public Users login(String username, String password) {
 
-        Users user = ud.getUserByUsername(username);
+    Users user = ud.getUserByUsername(username);
 
-        if (user == null) {
-            throw new UserNotFoundException("Username or password is incorrect");
-        }
-
-        if (!BCrypt.checkpw(password, user.getPassword())) {
-            throw new AuthenticationException("Username or password is incorrect");
-        }
-
-        if (!"manager".equalsIgnoreCase(user.getRole())) {
-            throw new AuthenticationException("This account is not a manager account.");
-        }
-
-        return user;
+    if (user == null) {
+        throw new UserNotFoundException("Username or password is incorrect");
     }
+
+    String storedPassword = user.getPassword().replace("$2b$", "$2a$");
+    if (!BCrypt.checkpw(password, storedPassword)) {
+        throw new AuthenticationException("Username or password is incorrect");
+    }
+
+    if (!"manager".equalsIgnoreCase(user.getRole())) {
+        throw new AuthenticationException("This account is not a manager account.");
+    }
+
+    return user;
+}
 }  

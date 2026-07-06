@@ -4,11 +4,13 @@ from rich.table import Table
 
 BASE_URL = "http://127.0.0.1:8000/ExpenseManager"
 user_id = None
+user_name=None
 console = Console()
 
 
 def employee_login():
     global user_id
+    global username
     console.print("\n[bold]--- Employee Login ---[/bold]")
     username = input("Username: ")
     password = input("Password: ")
@@ -17,7 +19,8 @@ def employee_login():
 
     if res.status_code == 200:
         user_id = res.json()["user_id"]
-        console.print("[green]Login successful.[/green]")
+        username=res.json()["username"]
+        console.print(f"[green] {username} succesfully logged in.[/green]")
         employee_menu()
     else:
         console.print(f"[red]Error: {res.json().get('error')}[/red]")
@@ -25,6 +28,7 @@ def employee_login():
 
 def employee_menu():
     global user_id
+    global username
     while True:
         console.print("\n[bold]--- Employee Portal ---[/bold]")
         print("1. Submit Expense")
@@ -46,8 +50,9 @@ def employee_menu():
 
         choice = input("Select an option: ").strip()
         if choice == "7":
-            console.print(f"[yellow]User {user_id} has been logged out.[/yellow]")
+            console.print(f"[yellow] {username} has been logged out.[/yellow]")
             user_id = None
+            username=None
             break
         elif choice in options:
             options[choice]()
@@ -115,9 +120,9 @@ def view_expenses():
         for e in expenses:
             reviewed = e.get('reviewed_date') or "N/A"
             table.add_row(
-                str(e['expense_id']), f"${e['amount']}", e['category'],
+                str(e['expense_id']), f"${e['amount']:.2f}", e['category'],
                 e['description'], e['status'], e['submitted'], reviewed
-            )
+                )
 
         console.print(table)
     else:
@@ -145,9 +150,9 @@ def view_history():
         for e in data["expenses"]:
             reviewed = e.get('reviewed_date') or "N/A"
             table.add_row(
-                str(e['expense_id']), f"${e['amount']}", e['category'],
+                str(e['expense_id']), f"${e['amount']:.2f}", e['category'],
                 e['description'], e['status'], e['submitted'], reviewed
-            )
+)
 
         console.print(table)
         console.print(f"\n[green]Total Approved: ${data['total_approved']}[/green]")
@@ -174,7 +179,7 @@ def get_pending():
 
         for e in expenses:
             table.add_row(
-                str(e['expense_id']), f"${e['amount']}", e['category'],
+                str(e['expense_id']), f"${e['amount']:.2f}", e['category'],
                 e['description'], e['submitted']
             )
 
