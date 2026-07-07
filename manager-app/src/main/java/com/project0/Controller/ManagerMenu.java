@@ -9,7 +9,9 @@ import com.project0.services.ExpenseService;
 import com.project0.model.Approvals;
 import com.project0.services.ApprovalService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.math.BigDecimal;
 
@@ -111,15 +113,27 @@ public class ManagerMenu {
         if (choice.equals("1")) {
             results = es.getAllExpenses();
         } else if (choice.equals("2")) {
-            System.out.print("Enter employee ID (0 to go back): ");
-            int employeeId;
-            try {
-                employeeId = Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid ID — please enter a number.");
+            List<Users> employees = as.getAllEmployees();
+            String header = center("Employees", 36);
+            int indent = header.length() - "Employees".length();
+            System.out.println(CYAN + BOLD + header + RESET);
+            for (Users u : employees) {
+                System.out.println(" ".repeat(indent) + u.getId() + " - " + u.getUsername());
+            }
+            System.out.print("Enter employee ID or name (0 to go back): ");
+            String input = scanner.nextLine().trim();
+            if (input.equals("0")) {
                 return;
             }
-            if (employeeId == 0) {
+            int employeeId = -1;
+            for (Users u : employees) {
+                if (u.getUsername().equalsIgnoreCase(input) || String.valueOf(u.getId()).equals(input)) {
+                    employeeId = u.getId();
+                    break;
+                }
+            }
+            if (employeeId == -1) {
+                System.out.println("No employee found matching '" + input + "'.");
                 return;
             }
             results = es.getExpensesByEmployee(employeeId);
@@ -235,7 +249,7 @@ public class ManagerMenu {
     }
 
     // ----- Bordered table rendering -----
-    private static final int W_ID = 5, W_EMP = 8, W_AMT = 10, W_CAT = 8, W_STAT = 9, W_DESC = 22, W_DATE = 10;
+    private static final int W_ID = 5, W_EMP = 12, W_AMT = 10, W_CAT = 8, W_STAT = 9, W_DESC = 22, W_DATE = 10;
 
     private String tableBorder() {
         return "+" + "-".repeat(W_EMP + 2) + "+" + "-".repeat(W_ID + 2) + "+"
@@ -255,7 +269,18 @@ public class ManagerMenu {
         return s;
     }
 
+    private String center(String s, int width) {
+        if (s.length() >= width) return s;
+        int left = (width - s.length()) / 2;
+        return " ".repeat(left) + s;
+    }
+
     private void printExpenseTable(List<Expenses> expenses, BigDecimal total) {
+        Map<Integer, String> names = new HashMap<>();
+        for (Users u : as.getAllEmployees()) {
+            names.put(u.getId(), u.getUsername());
+        }
+
         String border = tableBorder();
         System.out.println(border);
         System.out.println(CYAN + tableRow("Employee", "ID", "Amount", "Category", "Status", "Description", "Date") + RESET);
@@ -265,8 +290,9 @@ public class ManagerMenu {
             if (date.length() > W_DATE) {
                 date = date.substring(0, W_DATE);
             }
+            String employee = names.getOrDefault(e.getUser_id(), String.valueOf(e.getUser_id()));
             System.out.println(tableRow(
-                    String.valueOf(e.getUser_id()),
+                    fit(employee, W_EMP),
                     String.valueOf(e.getId()),
                     money(e.getAmount()),
                     e.getCategory(),

@@ -8,6 +8,7 @@ import com.project0.repository.UserDAOImpl;
 import com.project0.util.AppLogger;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 public class AuthService {
@@ -45,5 +46,9 @@ public class AuthService {
 
         logger.info("Login success: user '" + username + "'");
         return user;
+    }
+
+    public List<Users> getAllEmployees() {
+        return ud.getAllEmployees();
     }
 }
