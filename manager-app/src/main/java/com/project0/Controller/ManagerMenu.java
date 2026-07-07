@@ -101,7 +101,8 @@ public class ManagerMenu {
         System.out.println("2. By Employee");
         System.out.println("3. By Date");
         System.out.println("4. By Category");
-        System.out.println("5. Back");
+        System.out.println("5. By Status");
+        System.out.println("6. Back");
         System.out.print("Choice: ");
         String choice = scanner.nextLine();
 
@@ -137,6 +138,17 @@ public class ManagerMenu {
             }
             results = es.getExpensesByCategory(category);
         } else if (choice.equals("5")) {
+            System.out.print("Enter status (approved/denied, blank to go back): ");
+            String status = scanner.nextLine().trim().toLowerCase();
+            if (status.isBlank()) {
+                return;
+            }
+            if (!status.equals("approved") && !status.equals("denied")) {
+                System.out.println("Please enter 'approved' or 'denied'.");
+                return;
+            }
+            results = es.getExpensesByStatus(status);
+        } else if (choice.equals("6")) {
             return;
         } else {
             System.out.println("Invalid option.");
@@ -148,16 +160,11 @@ public class ManagerMenu {
             return;
         }
 
-        System.out.printf(CYAN + "%-6s %-10s %-10s %-20s %-10s" + RESET + "%n", "ID", "Employee", "Amount", "Description", "Date");
-        System.out.println("----------------------------------------------------------");
         BigDecimal total = BigDecimal.ZERO;
         for (Expenses e : results) {
-            System.out.printf("%-6d %-10d %-10s %-20s %-10s%n",
-                    e.getId(), e.getUser_id(), money(e.getAmount()), e.getDescription(), e.getDate());
             total = total.add(e.getAmount());
         }
-        System.out.println("----------------------------------------------------------");
-        System.out.printf(BOLD + "Total: %s" + RESET + "%n", money(total));
+        printExpenseTable(results, total);
     }
 
     private void reviewExpense() {
@@ -220,16 +227,57 @@ public class ManagerMenu {
             System.out.println("No pending expenses.");
             return;
         }
-        System.out.printf(CYAN + "%-6s %-10s %-10s %-20s %-10s" + RESET + "%n", "ID", "Employee", "Amount", "Description", "Date");
-        System.out.println("----------------------------------------------------------");
-        for (Expenses e : pending) {
-            System.out.printf("%-6d %-10d %-10s %-20s %-10s%n",
-                    e.getId(), e.getUser_id(), money(e.getAmount()), e.getDescription(), e.getDate());
-        }
+        printExpenseTable(pending, null);
     }
 
     private String money(BigDecimal amount) {
         return String.format("$%.2f", amount);
+    }
+
+    // ----- Bordered table rendering -----
+    private static final int W_ID = 5, W_EMP = 8, W_AMT = 10, W_CAT = 8, W_STAT = 9, W_DESC = 22, W_DATE = 10;
+
+    private String tableBorder() {
+        return "+" + "-".repeat(W_EMP + 2) + "+" + "-".repeat(W_ID + 2) + "+"
+                + "-".repeat(W_AMT + 2) + "+" + "-".repeat(W_CAT + 2) + "+"
+                + "-".repeat(W_STAT + 2) + "+" + "-".repeat(W_DESC + 2) + "+"
+                + "-".repeat(W_DATE + 2) + "+";
+    }
+
+    private String tableRow(String emp, String id, String amt, String cat, String stat, String desc, String date) {
+        return String.format("| %-" + W_EMP + "s | %-" + W_ID + "s | %-" + W_AMT + "s | %-" + W_CAT + "s | %-" + W_STAT + "s | %-" + W_DESC + "s | %-" + W_DATE + "s |",
+                emp, id, amt, cat, stat, desc, date);
+    }
+
+    private String fit(String s, int width) {
+        if (s == null) return "";
+        if (s.length() > width) return s.substring(0, width - 3) + "...";
+        return s;
+    }
+
+    private void printExpenseTable(List<Expenses> expenses, BigDecimal total) {
+        String border = tableBorder();
+        System.out.println(border);
+        System.out.println(CYAN + tableRow("Employee", "ID", "Amount", "Category", "Status", "Description", "Date") + RESET);
+        System.out.println(border);
+        for (Expenses e : expenses) {
+            String date = e.getDate() == null ? "" : e.getDate();
+            if (date.length() > W_DATE) {
+                date = date.substring(0, W_DATE);
+            }
+            System.out.println(tableRow(
+                    String.valueOf(e.getUser_id()),
+                    String.valueOf(e.getId()),
+                    money(e.getAmount()),
+                    e.getCategory(),
+                    approvalService.getStatus(e.getId()),
+                    fit(e.getDescription(), W_DESC),
+                    date));
+        }
+        System.out.println(border);
+        if (total != null) {
+            System.out.printf(BOLD + "Total: %s" + RESET + "%n", money(total));
+        }
     }
 
 }
