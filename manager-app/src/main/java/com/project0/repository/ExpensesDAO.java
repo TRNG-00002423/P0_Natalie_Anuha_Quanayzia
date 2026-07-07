@@ -13,6 +13,7 @@ public interface ExpensesDAO {
     List<Expenses> getExpensesByDate(String date);
     List<Expenses> getExpensesByCategory(String category);
     List<Expenses> getPendingExpenses();
+    List<Expenses> getExpensesByStatus(String status);
 
 
 

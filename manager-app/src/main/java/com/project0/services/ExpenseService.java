@@ -36,6 +36,10 @@ public class ExpenseService {
 
     public List<Expenses> getExpensesByCategory(String category) {return ed.getExpensesByCategory(category);}
 
+    public List<Expenses> getExpensesByStatus(String status) {
+        return ed.getExpensesByStatus(status);
+    }
+
     public Expenses getExpenseById(int expense_id) {
         return ed.getExpenseByID(expense_id);
     }

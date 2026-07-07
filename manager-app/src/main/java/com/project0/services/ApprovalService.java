@@ -28,4 +28,9 @@ public class ApprovalService {
 
         return result;
     }
+
+    public String getStatus(int expenseId) {
+        Approvals approval = ad.getApprovalByExpenseId(expenseId);
+        return approval != null ? approval.getStatus() : "none";
+    }
 }

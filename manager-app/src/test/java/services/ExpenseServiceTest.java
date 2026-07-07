@@ -126,7 +126,6 @@ public class ExpenseServiceTest {
 
     @Test
     void getPendingExpenses_includesOurPendingExpense() throws SQLException {
-        // give our test expense a pending approval so it counts as pending
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO ExpenseManager_approval (expense_id_id, status, comment) VALUES (?, 'pending', '')")) {
@@ -145,6 +144,54 @@ public class ExpenseServiceTest {
 
         assertTrue(result.stream()
                 .anyMatch(e -> e.getDescription().equals("integration_test_expense")));
+    }
+
+    @Test
+    void getExpensesByDate_findsExpenseStoredWithATimestamp() throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO ExpenseManager_expense (user_id_id, amount, description, created_date, category) VALUES (?, ?, ?, ?, ?)")) {
+            stmt.setInt(1, testUserId);
+            stmt.setBigDecimal(2, new BigDecimal("10.00"));
+            stmt.setString(3, TEST_DESCRIPTION);
+            stmt.setString(4, "2026-07-06 15:39:25");
+            stmt.setString(5, TEST_CATEGORY);
+            stmt.executeUpdate();
+        }
+
+        List<Expenses> result = expenseService.getExpensesByDate("2026-07-06");
+
+        assertTrue(result.stream()
+                .anyMatch(e -> e.getDescription().equals(TEST_DESCRIPTION)));
+    }
+
+    @Test
+    void reportTotal_sumsExpenseAmountsCorrectly() throws SQLException {
+        insertExpense(new BigDecimal("10.00"));
+        insertExpense(new BigDecimal("20.00"));
+
+        List<Expenses> expenses = expenseService.getExpensesByEmployee(testUserId);
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (Expenses e : expenses) {
+            total = total.add(e.getAmount());
+        }
+
+        // 42.50 + 10.00 + 20.00 = 72.50
+        assertEquals(0, new BigDecimal("72.50").compareTo(total));
+    }
+
+    private void insertExpense(BigDecimal amount) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO ExpenseManager_expense (user_id_id, amount, description, created_date, category) VALUES (?, ?, ?, ?, ?)")) {
+            stmt.setInt(1, testUserId);
+            stmt.setBigDecimal(2, amount);
+            stmt.setString(3, TEST_DESCRIPTION);
+            stmt.setString(4, TEST_DATE);
+            stmt.setString(5, TEST_CATEGORY);
+            stmt.executeUpdate();
+        }
     }
 
 }

@@ -40,7 +40,7 @@ public class ExpensesDAOImpl implements ExpensesDAO {
 
     @Override
     public List<Expenses> getListofExpenses() {
-        String sqlSelect = "SELECT * FROM ExpenseManager_expense";
+        String sqlSelect = "SELECT * FROM ExpenseManager_expense ORDER BY user_id_id, id";
         List<Expenses> expenses = new ArrayList<>();
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -81,13 +81,13 @@ public class ExpensesDAOImpl implements ExpensesDAO {
 
     @Override
     public List<Expenses> getExpensesByDate(String date) {
-        String sqlSelect = "SELECT * FROM ExpenseManager_expense WHERE created_date = ?";
+        String sqlSelect = "SELECT * FROM ExpenseManager_expense WHERE created_date LIKE ?";
         List<Expenses> expenses = new ArrayList<>();
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sqlSelect)) {
 
-            stmt.setString(1, date);
+            stmt.setString(1, date + "%");
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 expenses.add(mapRowToExpense(rs));
@@ -110,6 +110,29 @@ public class ExpensesDAOImpl implements ExpensesDAO {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                expenses.add(mapRowToExpense(rs));
+            }
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
+        }
+
+        return expenses;
+    }
+
+    @Override
+    public List<Expenses> getExpensesByStatus(String status) {
+        String sql = "SELECT e.* FROM ExpenseManager_expense e " +
+                "JOIN ExpenseManager_approval a ON e.id = a.expense_id_id " +
+                "WHERE a.status = ? ORDER BY e.user_id_id, e.id";
+        List<Expenses> expenses = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, status);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 expenses.add(mapRowToExpense(rs));
