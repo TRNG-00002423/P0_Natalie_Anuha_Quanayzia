@@ -184,53 +184,56 @@ public class ManagerMenu {
     private void reviewExpense() {
         viewPendingExpenses();
 
-        System.out.print("Enter the expense ID to review (0 to go back): ");
-        int expenseId;
-        try {
-            expenseId = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID — please enter a number.");
-            return;
-        }
-
-        if (expenseId == 0) {
-            return;
-        }
-
-        if (es.getExpenseById(expenseId) == null) {
-            System.out.println("No expense found with ID " + expenseId + ".");
-            return;
-        }
-
-        System.out.print("Approve or Deny? (a/d, blank to go back): ");
-        String choice = scanner.nextLine().trim().toLowerCase();
-        if (choice.isBlank()) {
-            return;
-        }
-
-        String status;
-        if (choice.equals("a")) {
-            status = "approved";
-        } else if (choice.equals("d")) {
-            status = "denied";
-        } else {
-            System.out.println("Invalid choice.");
-            return;
-        }
-
-        System.out.print("Comment: ");
-        String comment = scanner.nextLine();
-
-        Approvals result = approvalService.reviewExpense(expenseId, currentUser.getId(), status, comment);
-
-        if (result != null) {
-            String color = RED;
-            if (result.getStatus().equals("approved")) {
-                color = GREEN;
+        while (true) {
+            System.out.print("Enter the expense ID to review (0 to go back): ");
+            int expenseId;
+            try {
+                expenseId = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid ID — please enter a number.");
+                continue;
             }
-            System.out.println(color + "Expense #" + expenseId + " has been " + result.getStatus() + "." + RESET);
-        } else {
-            System.out.println(RED + "Could not update — no approval found for that expense." + RESET);
+
+            if (expenseId == 0) {
+                return;
+            }
+
+            if (es.getExpenseById(expenseId) == null) {
+                System.out.println("No expense found with ID " + expenseId + ".");
+                continue;
+            }
+
+            System.out.print("Approve or Deny? (a/d, blank to go back): ");
+            String choice = scanner.nextLine().trim().toLowerCase();
+            if (choice.isBlank()) {
+                continue;
+            }
+
+            String status;
+            if (choice.equals("a")) {
+                status = "approved";
+            } else if (choice.equals("d")) {
+                status = "denied";
+            } else {
+                System.out.println("Invalid choice.");
+                continue;
+            }
+
+            System.out.print("Comment: ");
+            String comment = scanner.nextLine();
+
+            Approvals result = approvalService.reviewExpense(expenseId, currentUser.getId(), status, comment);
+
+            if (result != null) {
+                String color = RED;
+                if (result.getStatus().equals("approved")) {
+                    color = GREEN;
+                }
+                System.out.println(color + "Expense #" + expenseId + " has been " + result.getStatus() + "." + RESET);
+            } else {
+                System.out.println(RED + "Could not update — no approval found for that expense." + RESET);
+            }
+            return;
         }
     }
 
@@ -285,10 +288,19 @@ public class ManagerMenu {
         System.out.println(border);
         System.out.println(CYAN + tableRow("Employee", "ID", "Amount", "Category", "Status", "Description", "Date") + RESET);
         System.out.println(border);
+        int approved = 0, denied = 0, pending = 0;
         for (Expenses e : expenses) {
             String date = e.getDate() == null ? "" : e.getDate();
             if (date.length() > W_DATE) {
                 date = date.substring(0, W_DATE);
+            }
+            String status = approvalService.getStatus(e.getId());
+            if (status.equals("approved")) {
+                approved++;
+            } else if (status.equals("denied")) {
+                denied++;
+            } else if (status.equals("pending")) {
+                pending++;
             }
             String employee = names.getOrDefault(e.getUser_id(), String.valueOf(e.getUser_id()));
             System.out.println(tableRow(
@@ -296,13 +308,17 @@ public class ManagerMenu {
                     String.valueOf(e.getId()),
                     money(e.getAmount()),
                     e.getCategory(),
-                    approvalService.getStatus(e.getId()),
+                    status,
                     fit(e.getDescription(), W_DESC),
                     date));
         }
         System.out.println(border);
         if (total != null) {
-            System.out.printf(BOLD + "Total: %s" + RESET + "%n", money(total));
+            System.out.println(
+                    BOLD + "Total: " + money(total) + RESET
+                    + "     Pending: " + pending
+                    + "     " + GREEN + "Approved: " + approved + RESET
+                    + "     " + RED + "Denied: " + denied + RESET);
         }
     }
 

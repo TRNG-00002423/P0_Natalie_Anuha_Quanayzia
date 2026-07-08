@@ -2,6 +2,7 @@ package services;
 
 import com.project0.model.Expenses;
 import com.project0.services.ExpenseService;
+import com.project0.services.ApprovalService;
 import com.project0.util.DatabaseConnection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -181,15 +182,51 @@ public class ExpenseServiceTest {
         assertEquals(0, new BigDecimal("72.50").compareTo(total));
     }
 
-    private void insertExpense(BigDecimal amount) throws SQLException {
+    @Test
+    void getExpensesByStatus_returnsOnlyMatchingStatus() throws SQLException {
+        // setUp's expense -> pending; a second expense -> approved
+        insertApproval(insertedExpenseId, "pending");
+        int approvedId = insertExpense(new BigDecimal("30.00"));
+        insertApproval(approvedId, "approved");
+
+        List<Expenses> approved = expenseService.getExpensesByStatus("approved");
+
+        assertTrue(approved.stream().anyMatch(e -> e.getId() == approvedId));
+        assertFalse(approved.stream().anyMatch(e -> e.getId() == insertedExpenseId));
+    }
+
+    @Test
+    void getStatus_returnsTheApprovalStatus() throws SQLException {
+        insertApproval(insertedExpenseId, "approved");
+
+        ApprovalService approvalService = new ApprovalService();
+        assertEquals("approved", approvalService.getStatus(insertedExpenseId));
+    }
+
+    private int insertExpense(BigDecimal amount) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO ExpenseManager_expense (user_id_id, amount, description, created_date, category) VALUES (?, ?, ?, ?, ?)")) {
+                     "INSERT INTO ExpenseManager_expense (user_id_id, amount, description, created_date, category) VALUES (?, ?, ?, ?, ?)",
+                     Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, testUserId);
             stmt.setBigDecimal(2, amount);
             stmt.setString(3, TEST_DESCRIPTION);
             stmt.setString(4, TEST_DATE);
             stmt.setString(5, TEST_CATEGORY);
+            stmt.executeUpdate();
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) return keys.getInt(1);
+            }
+        }
+        throw new SQLException("Failed to insert expense");
+    }
+
+    private void insertApproval(int expenseId, String status) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO ExpenseManager_approval (expense_id_id, status, comment) VALUES (?, ?, '')")) {
+            stmt.setInt(1, expenseId);
+            stmt.setString(2, status);
             stmt.executeUpdate();
         }
     }
