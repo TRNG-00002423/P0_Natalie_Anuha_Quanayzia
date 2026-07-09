@@ -1,6 +1,7 @@
 import requests
 from rich.console import Console
 from rich.table import Table
+import getpass
 
 BASE_URL = "http://127.0.0.1:8000/ExpenseManager"
 user_id = None
@@ -13,14 +14,14 @@ def employee_login():
     global username
     console.print("\n[bold]--- Employee Login ---[/bold]")
     username = input("Username: ")
-    password = input("Password: ")
+    password = getpass.getpass("Password: ")
 
     res = requests.post(f"{BASE_URL}/login/", json={"username": username, "password": password})
 
     if res.status_code == 200:
         user_id = res.json()["user_id"]
-        username=res.json()["username"]
-        console.print(f"[green] {username} succesfully logged in.[/green]")
+        username = res.json()["username"]
+        console.print(f"[green] {username} successfully logged in.[/green]")
         employee_menu()
     else:
         console.print(f"[red]Error: {res.json().get('error')}[/red]")
