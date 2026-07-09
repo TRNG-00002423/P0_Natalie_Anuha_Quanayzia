@@ -100,7 +100,6 @@ def submit_expense():
     else:
         console.print(f"[red]{msg}[/red]")
 
-
 def view_expenses():
     console.print("\n[bold]--- My Expenses ---[/bold]")
     res = requests.get(f"{BASE_URL}/expenses/{user_id}/")
@@ -118,13 +117,15 @@ def view_expenses():
         table.add_column("Status")
         table.add_column("Submitted")
         table.add_column("Reviewed")
+        table.add_column("Comment")
 
         for e in expenses:
             reviewed = e.get('reviewed_date') or "N/A"
+            comment = e.get('comment') or "N/A"
             table.add_row(
                 str(e['expense_id']), f"${e['amount']:.2f}", e['category'],
-                e['description'], e['status'], e['submitted'], reviewed
-                )
+                e['description'], e['status'], e['submitted'], reviewed, comment
+            )
 
         console.print(table)
     else:
@@ -148,13 +149,15 @@ def view_history():
         table.add_column("Status")
         table.add_column("Submitted")
         table.add_column("Reviewed")
+        table.add_column("Comment")
 
         for e in data["expenses"]:
             reviewed = e.get('reviewed_date') or "N/A"
+            comment = e.get('comment') or "N/A"
             table.add_row(
                 str(e['expense_id']), f"${e['amount']:.2f}", e['category'],
-                e['description'], e['status'], e['submitted'], reviewed
-)
+                e['description'], e['status'], e['submitted'], reviewed, comment
+            )
 
         console.print(table)
         console.print(f"\n[green]Total Approved: ${data['total_approved']}[/green]")

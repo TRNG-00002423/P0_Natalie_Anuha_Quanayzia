@@ -25,7 +25,7 @@ def get_expenses_with_status(employee):
         approval = Approval.objects.filter(expense_id=e).first()
         status = approval.status if approval else 'pending'
         rows.append({'expense': e, 'status': status,
-                     'submitted': e.created_date, 'reviewed_date': approval.approved_date if approval else None})
+                     'submitted': e.created_date, 'reviewed_date': approval.approved_date if approval else None, 'comment': approval.comment if approval else ''})
     return rows
 
 
@@ -38,11 +38,11 @@ def get_expense_history(employee):
         approval = Approval.objects.filter(expense_id=e).first()
         if approval and approval.status == 'approved':
             rows.append({'expense': e, 'status': 'approved', 'submitted': e.created_date,
-                         'reviewed_date': approval.approved_date})
+                         'reviewed_date': approval.approved_date, 'comment': approval.comment})
             total_approved += e.amount
         elif approval and approval.status == 'denied':
             rows.append({'expense': e, 'status': 'denied', 'submitted': e.created_date,
-                         'reviewed_date': approval.approved_date})
+                         'reviewed_date': approval.approved_date, 'comment': approval.comment})
             total_denied += e.amount
     return rows, total_approved, total_denied
 
