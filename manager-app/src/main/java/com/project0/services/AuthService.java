@@ -51,4 +51,8 @@ public class AuthService {
     public List<Users> getAllEmployees() {
         return ud.getAllEmployees();
     }
+
+    public List<Users> getAllUsers() {
+        return ud.getAllUsers();
+    }
 }

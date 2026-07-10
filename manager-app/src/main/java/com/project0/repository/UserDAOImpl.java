@@ -69,4 +69,28 @@ public class UserDAOImpl implements UserDAO {
 
         return employees;
     }
+
+    @Override
+    public List<Users> getAllUsers() {
+        String sqlSelect = "SELECT * FROM ExpenseManager_user ORDER BY id";
+        List<Users> users = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlSelect)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                users.add(new Users(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("role")
+                ));
+            }
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
+        }
+
+        return users;
+    }
 }

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class ManagerMenu {
 
@@ -151,12 +153,23 @@ public class ManagerMenu {
             }
             results = es.getExpensesByEmployee(employeeId);
         } else if (choice.equals("3")) {
-            System.out.print("Enter date (YYYY-MM-DD, blank to go back): ");
-            String date = scanner.nextLine().trim();
-            if (date.isBlank()) {
+            System.out.print("Enter start date (YYYY-MM-DD, blank to go back): ");
+            String start = scanner.nextLine().trim();
+            if (start.isBlank()) {
                 return;
             }
-            results = es.getExpensesByDate(date);
+            System.out.print("Enter end date (YYYY-MM-DD): ");
+            String end = scanner.nextLine().trim();
+
+            String endExclusive;
+            try {
+                LocalDate.parse(start);                                      // reject a bad start date
+                endExclusive = LocalDate.parse(end).plusDays(1).toString();  // reject a bad end date + include the whole day
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date. Please use the format YYYY-MM-DD.");
+                return;
+            }
+            results = es.getExpensesByDateRange(start, endExclusive);
         } else if (choice.equals("4")) {
             System.out.print("Enter category (MEALS/TRAVEL/LODGING/OFFICE/OTHER, blank to go back): ");
             String category = scanner.nextLine().trim().toUpperCase();
@@ -191,7 +204,7 @@ public class ManagerMenu {
         for (Expenses e : results) {
             total = total.add(e.getAmount());
         }
-        printExpenseTable(results, total);
+        printExpenseTable(results, total, true);
     }
 
     private void reviewExpense() {
@@ -257,7 +270,7 @@ public class ManagerMenu {
             System.out.println("No pending expenses.");
             return;
         }
-        printExpenseTable(pending, null);
+        printExpenseTable(pending, null, false);
     }
 
     private String money(BigDecimal amount) {
@@ -265,18 +278,22 @@ public class ManagerMenu {
     }
 
     // ----- Bordered table rendering -----
-    private static final int W_ID = 5, W_EMP = 12, W_AMT = 10, W_CAT = 8, W_STAT = 9, W_DESC = 22, W_DATE = 10;
+    private static final int W_ID = 5, W_EMP = 10, W_AMT = 9, W_CAT = 8, W_STAT = 9, W_DESC = 22, W_DESC_NARROW = 16, W_DATE = 10, W_REV = 9, W_RDATE = 10;
 
-    private String tableBorder() {
-        return "+" + "-".repeat(W_EMP + 2) + "+" + "-".repeat(W_ID + 2) + "+"
-                + "-".repeat(W_AMT + 2) + "+" + "-".repeat(W_CAT + 2) + "+"
-                + "-".repeat(W_STAT + 2) + "+" + "-".repeat(W_DESC + 2) + "+"
-                + "-".repeat(W_DATE + 2) + "+";
+    private String tableBorder(int[] widths) {
+        StringBuilder sb = new StringBuilder("+");
+        for (int w : widths) {
+            sb.append("-".repeat(w + 2)).append("+");
+        }
+        return sb.toString();
     }
 
-    private String tableRow(String emp, String id, String amt, String cat, String stat, String desc, String date) {
-        return String.format("| %-" + W_EMP + "s | %-" + W_ID + "s | %-" + W_AMT + "s | %-" + W_CAT + "s | %-" + W_STAT + "s | %-" + W_DESC + "s | %-" + W_DATE + "s |",
-                emp, id, amt, cat, stat, desc, date);
+    private String tableRow(String[] vals, int[] widths) {
+        StringBuilder sb = new StringBuilder("|");
+        for (int i = 0; i < vals.length; i++) {
+            sb.append(String.format(" %-" + widths[i] + "s |", vals[i]));
+        }
+        return sb.toString();
     }
 
     private String fit(String s, int width) {
@@ -291,47 +308,80 @@ public class ManagerMenu {
         return " ".repeat(left) + s;
     }
 
-    private void printExpenseTable(List<Expenses> expenses, BigDecimal total) {
+    private void printExpenseTable(List<Expenses> expenses, BigDecimal total, boolean showReview) {
         Map<Integer, String> names = new HashMap<>();
-        for (Users u : as.getAllEmployees()) {
+        for (Users u : as.getAllUsers()) {
             names.put(u.getId(), u.getUsername());
         }
 
-        String border = tableBorder();
+        int descW = showReview ? W_DESC_NARROW : W_DESC;
+        int[] widths;
+        String[] headers;
+        if (showReview) {
+            widths = new int[]{W_EMP, W_ID, W_AMT, W_CAT, W_STAT, descW, W_DATE, W_REV, W_RDATE};
+            headers = new String[]{"Employee", "ID", "Amount", "Category", "Status", "Description", "Submitted", "Reviewer", "Reviewed"};
+        } else {
+            widths = new int[]{W_EMP, W_ID, W_AMT, W_CAT, W_STAT, descW, W_DATE};
+            headers = new String[]{"Employee", "ID", "Amount", "Category", "Status", "Description", "Submitted"};
+        }
+
+        String border = tableBorder(widths);
         System.out.println(border);
-        System.out.println(CYAN + tableRow("Employee", "ID", "Amount", "Category", "Status", "Description", "Date") + RESET);
+        System.out.println(CYAN + tableRow(headers, widths) + RESET);
         System.out.println(border);
         int approved = 0, denied = 0, pending = 0;
+        BigDecimal deniedTotal = BigDecimal.ZERO;
         for (Expenses e : expenses) {
-            String date = e.getDate() == null ? "" : e.getDate();
-            if (date.length() > W_DATE) {
-                date = date.substring(0, W_DATE);
+            String submitted = e.getDate() == null ? "" : e.getDate();
+            if (submitted.length() > W_DATE) {
+                submitted = submitted.substring(0, W_DATE);
             }
-            String status = approvalService.getStatus(e.getId());
+            Approvals approval = approvalService.getApproval(e.getId());
+            String status = approval != null ? approval.getStatus() : "none";
             if (status.equals("approved")) {
                 approved++;
             } else if (status.equals("denied")) {
                 denied++;
+                deniedTotal = deniedTotal.add(e.getAmount());
             } else if (status.equals("pending")) {
                 pending++;
             }
             String employee = names.getOrDefault(e.getUser_id(), String.valueOf(e.getUser_id()));
-            System.out.println(tableRow(
-                    fit(employee, W_EMP),
-                    String.valueOf(e.getId()),
-                    money(e.getAmount()),
-                    e.getCategory(),
-                    status,
-                    fit(e.getDescription(), W_DESC),
-                    date));
+
+            String[] vals;
+            if (showReview) {
+                String reviewer = "-";
+                if (approval != null && approval.getReviewer() > 0) {
+                    reviewer = names.getOrDefault(approval.getReviewer(), String.valueOf(approval.getReviewer()));
+                }
+                String reviewed = "-";
+                if (approval != null && approval.getReview_date() != null) {
+                    reviewed = approval.getReview_date();
+                    if (reviewed.length() > W_RDATE) {
+                        reviewed = reviewed.substring(0, W_RDATE);
+                    }
+                }
+                vals = new String[]{
+                        fit(employee, W_EMP), String.valueOf(e.getId()), money(e.getAmount()),
+                        e.getCategory(), status, fit(e.getDescription(), descW), submitted,
+                        fit(reviewer, W_REV), reviewed
+                };
+            } else {
+                vals = new String[]{
+                        fit(employee, W_EMP), String.valueOf(e.getId()), money(e.getAmount()),
+                        e.getCategory(), status, fit(e.getDescription(), descW), submitted
+                };
+            }
+            System.out.println(tableRow(vals, widths));
         }
         System.out.println(border);
         if (total != null) {
+            BigDecimal trueTotal = total.subtract(deniedTotal);
             System.out.println(
-                    BOLD + "Total: " + money(total) + RESET
-                    + "     Pending: " + pending
-                    + "     " + GREEN + "Approved: " + approved + RESET
-                    + "     " + RED + "Denied: " + denied + RESET);
+                    BOLD + "Total: " + money(trueTotal) + RESET
+                    + "    Pending: " + pending
+                    + "    " + GREEN + "Approved: " + approved + RESET
+                    + "    " + RED + "Denied: " + denied + RESET);
         }
     }
 

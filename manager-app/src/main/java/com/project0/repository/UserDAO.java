@@ -9,4 +9,5 @@ public interface UserDAO {
 
     Users getUserByUsername(String username);
     List<Users> getAllEmployees();
+    List<Users> getAllUsers();
 }

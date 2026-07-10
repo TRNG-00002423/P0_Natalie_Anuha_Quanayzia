@@ -34,6 +34,10 @@ public class ExpenseService {
         return ed.getExpensesByDate(date);
     }
 
+    public List<Expenses> getExpensesByDateRange(String start, String endExclusive) {
+        return ed.getExpensesByDateRange(start, endExclusive);
+    }
+
     public List<Expenses> getExpensesByCategory(String category) {return ed.getExpensesByCategory(category);}
 
     public List<Expenses> getExpensesByStatus(String status) {
