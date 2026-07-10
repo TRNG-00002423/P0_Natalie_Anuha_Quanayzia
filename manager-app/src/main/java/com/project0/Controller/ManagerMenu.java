@@ -9,6 +9,7 @@ import com.project0.services.ExpenseService;
 import com.project0.model.Approvals;
 import com.project0.services.ApprovalService;
 
+import java.io.Console;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,11 +54,23 @@ public class ManagerMenu {
     }
 
     private boolean login() {
-        System.out.print("Username: ");
-        String username = scanner.nextLine();
+        Console console = System.console();
 
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
+        System.out.print("Username: ");
+        String username;
+        String password;
+
+        if (console != null) {
+            username = console.readLine();
+            char[] passwordChars = console.readPassword("Password: ");
+            password = new String(passwordChars);
+            java.util.Arrays.fill(passwordChars, ' ');
+        } else {
+            // Fallback for IDEs
+            username = scanner.nextLine();
+            System.out.print("Password: ");
+            password = scanner.nextLine();
+        }
 
         try {
             currentUser = as.login(username, password);
