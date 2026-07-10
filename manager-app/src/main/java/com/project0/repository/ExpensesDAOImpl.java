@@ -101,6 +101,28 @@ public class ExpensesDAOImpl implements ExpensesDAO {
     }
 
     @Override
+    public List<Expenses> getExpensesByDateRange(String start, String endExclusive) {
+        String sql = "SELECT * FROM ExpenseManager_expense WHERE created_date >= ? AND created_date < ? ORDER BY created_date";
+        List<Expenses> expenses = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, start);
+            stmt.setString(2, endExclusive);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                expenses.add(mapRowToExpense(rs));
+            }
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error: " + e.getMessage(), e);
+        }
+
+        return expenses;
+    }
+
+    @Override
     public List<Expenses> getPendingExpenses() {
         String sql = "SELECT e.* FROM ExpenseManager_expense e " +
                 "JOIN ExpenseManager_approval a ON e.id = a.expense_id_id " +
