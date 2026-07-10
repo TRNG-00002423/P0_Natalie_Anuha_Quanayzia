@@ -134,3 +134,7 @@ java.sql.SQLException: path to 'C:\Users\qjgar\Documents\Revature\RevatureExpens
 
 Jul 06, 2026 1:37:15 PM com.project0.services.AuthService login
 INFO: Login success: user 'manager'
+Jul 09, 2026 5:31:51 PM com.project0.services.AuthService login
+WARNING: Login failed: wrong password for user 'alice'
+Jul 09, 2026 5:32:01 PM com.project0.services.AuthService login
+WARNING: Login denied: user 'alice' is not a manager
